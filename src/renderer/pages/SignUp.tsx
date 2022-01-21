@@ -1,32 +1,57 @@
 import { useNavigate } from 'react-router-dom';
+import * as Yup from 'yup';
 
-import { useState } from 'react';
+import { Form } from '@unform/web';
+
+import { useRef, useState } from 'react';
 import { api } from 'renderer/services/api';
+import { FormHandles } from '@unform/core';
+import getValidationErrors from 'renderer/helpers/getValidationErrors';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { LinkButton } from '../components/LinkButton';
 
+interface FormData {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
 export function SignUp(): JSX.Element {
   const navigate = useNavigate();
 
+  const formRef = useRef<FormHandles>(null);
+
   const [loading, setLoading] = useState(false);
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  async function handleSubmit(data: FormData): Promise<void> {
+    const { firstName, lastName, phone, email, password } = data;
 
-  async function handleSubmit(): Promise<void> {
     try {
-      if (password !== confirmPassword) {
-        throw new Error('Passwords do not match');
-      }
+      formRef.current?.setErrors({});
+
+      const schema = Yup.object().shape({
+        firstName: Yup.string().required(),
+        lastName: Yup.string().required(),
+        phone: Yup.string().required(),
+        email: Yup.string().required(),
+        password: Yup.string().required(),
+        confirmPassword: Yup.string().oneOf(
+          [Yup.ref('password'), undefined],
+          'Passwords do not match'
+        ),
+      });
+
+      await schema.validate(data, {
+        abortEarly: false,
+      });
 
       setLoading(true);
 
-      const response = await api.post('/users', {
+      await api.post('/users', {
         firstName,
         lastName,
         phone,
@@ -38,10 +63,10 @@ export function SignUp(): JSX.Element {
 
       navigate(-1);
     } catch (err) {
-      if (err.data?.status === 'validation_error') {
-        window.alert(JSON.stringify(err.data.errors));
-      } else {
-        window.alert(err.message);
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
+
+        formRef.current?.setErrors(errors);
       }
     } finally {
       setLoading(false);
@@ -53,46 +78,30 @@ export function SignUp(): JSX.Element {
       <div className="p-8 flex flex-col max-w-sm w-full">
         <h1 className="text-4xl font-bold self-center">Sign Up</h1>
 
-        <Input
-          placeholder="First name"
-          className="mt-8"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-        />
-        <Input
-          placeholder="Last name"
-          className="mt-4"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-        />
-        <Input
-          placeholder="Mobile phone with country"
-          className="mt-4"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-        <Input
-          placeholder="Email"
-          className="mt-4"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Input
-          placeholder="Password"
-          className="mt-4"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <Input
-          placeholder="Confirm password"
-          className="mt-4"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
+        <Form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className="mt-8 flex flex-col gap-2"
+        >
+          <Input name="firstName" placeholder="First name" label="First name" />
+          <Input name="lastName" placeholder="Last name" label="Last name" />
+          <Input
+            name="phone"
+            placeholder="Mobile phone with country"
+            label="Phone"
+          />
+          <Input name="email" placeholder="Email" label="Email" />
+          <Input name="password" placeholder="Password" label="Password" />
+          <Input
+            name="confirmPassword"
+            placeholder="Confirm password"
+            label="Confirm password"
+          />
 
-        <Button className="mt-8" onClick={handleSubmit} isLoading={loading}>
-          sign up
-        </Button>
+          <Button type="submit" className="mt-8" isLoading={loading}>
+            sign up
+          </Button>
+        </Form>
 
         <span className="self-center mt-8">
           Already have an account?{' '}

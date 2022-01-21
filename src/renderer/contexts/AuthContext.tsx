@@ -1,9 +1,22 @@
-import { createContext, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+type UserType = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+};
+
+interface SignInData {
+  user: UserType;
+  token: string;
+}
 interface AuthContextData {
   isSigned: boolean;
-  signIn: () => void;
+  token: string;
+  user: UserType | null;
+  signIn: (data: SignInData) => void;
   signOut: () => void;
 }
 
@@ -20,20 +33,47 @@ export function AuthContextProvider({
 }: AuthContextProviderProps): JSX.Element {
   const navigate = useNavigate();
 
-  const [isSigned, setIsSigned] = useState(false);
+  const [token, setToken] = useState(() => {
+    const tokenData = localStorage.getItem('@mocha:token');
 
-  function signIn(): void {
-    setIsSigned(true);
+    if (tokenData) {
+      return tokenData;
+    }
+
+    return '';
+  });
+  const [user, setUser] = useState<UserType | null>(() => {
+    const userData = localStorage.getItem('@mocha:user');
+
+    if (userData) {
+      return JSON.parse(userData);
+    }
+
+    return null;
+  });
+
+  const isSigned = useMemo(() => !!token && !!user?.id, [token, user]);
+
+  function signIn(data: SignInData): void {
+    localStorage.setItem('@mocha:token', data.token);
+    localStorage.setItem('@mocha:user', JSON.stringify(data.user));
+
+    setToken(data.token);
+    setUser(data.user);
   }
 
   function signOut(): void {
-    navigate('/');
+    localStorage.removeItem('@mocha:token');
+    localStorage.removeItem('@mocha:user');
 
-    setIsSigned(false);
+    setToken('');
+    setUser(null);
+
+    navigate('/');
   }
 
   return (
-    <AuthContext.Provider value={{ isSigned, signIn, signOut }}>
+    <AuthContext.Provider value={{ isSigned, token, user, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

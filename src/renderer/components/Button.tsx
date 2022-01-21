@@ -1,11 +1,13 @@
 import { ButtonHTMLAttributes } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  type: 'button' | 'submit';
   children: string;
   isLoading?: boolean;
 }
 
 export function Button({
+  type,
   children,
   className,
   isLoading,
@@ -14,7 +16,7 @@ export function Button({
 }: ButtonProps): JSX.Element {
   return (
     <button
-      type="button"
+      type={type}
       className={`px-6 bg-emerald-400 h-10 uppercase ${className}`}
       {...rest}
       disabled={isLoading || disabled}

@@ -1,19 +1,44 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useContext, useRef, useState } from 'react';
+import * as Yup from 'yup';
 import { api } from 'renderer/services/api';
+import { AuthContext } from 'renderer/contexts/AuthContext';
+import { Form } from '@unform/web';
+import { FormHandles } from '@unform/core';
+import getValidationErrors from 'renderer/helpers/getValidationErrors';
 import { LinkButton } from '../components/LinkButton';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 
+interface FormData {
+  email: string;
+  password: string;
+}
+
 export function SignIn(): JSX.Element {
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const formRef = useRef<FormHandles>(null);
 
-  async function handleSubmit(): Promise<void> {
+  const { signIn } = useContext(AuthContext);
+
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(data: FormData): Promise<void> {
+    const { email, password } = data;
+
     try {
+      formRef.current?.setErrors({});
+
+      const schema = Yup.object().shape({
+        email: Yup.string().required(),
+        password: Yup.string().required(),
+      });
+
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+
       setLoading(true);
 
       const response = await api.post('/sessions', {
@@ -21,15 +46,13 @@ export function SignIn(): JSX.Element {
         password,
       });
 
-      window.alert(JSON.stringify(response.data));
+      signIn(response.data);
     } catch (err) {
-      if (err.data?.type === 'validation_error') {
-        window.alert(err.data.errors);
-      } else {
-        window.alert(err.message);
-      }
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
 
-      console.log(err);
+        formRef.current?.setErrors(errors);
+      }
     } finally {
       setLoading(false);
     }
@@ -41,28 +64,27 @@ export function SignIn(): JSX.Element {
         <h1 className="text-4xl font-bold self-center">Sign In</h1>
 
         <Button
+          type="button"
           className="mt-12"
           onClick={() => window.alert('Under contruction.')}
         >
           continue with github
         </Button>
 
-        <Input
-          placeholder="email"
-          className="mt-8"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Input
-          placeholder="password"
-          className="mt-4"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <span className="flex justify-center my-4">or</span>
 
-        <Button className="mt-8" onClick={handleSubmit} isLoading={loading}>
-          sign in
-        </Button>
+        <Form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-2 "
+        >
+          <Input name="email" placeholder="Email" label="Email" />
+          <Input name="password" placeholder="Password" label="Password" />
+
+          <Button type="submit" className="mt-8" isLoading={loading}>
+            sign in
+          </Button>
+        </Form>
 
         <LinkButton
           className="mt-8"
