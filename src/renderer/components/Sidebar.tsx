@@ -23,7 +23,7 @@ export function Sidebar(): JSX.Element {
         </li>
         <li className="flex">
           <Link
-            to="/connections"
+            to="/rest"
             className="flex-1 flex items-center justify-center h-10 hover:bg-blue-400"
           >
             R
@@ -31,7 +31,7 @@ export function Sidebar(): JSX.Element {
         </li>
         <li className="flex">
           <Link
-            to="/connections"
+            to="/notes"
             className="flex-1 flex items-center justify-center h-10 hover:bg-blue-400"
           >
             N

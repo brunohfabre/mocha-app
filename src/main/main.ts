@@ -27,10 +27,24 @@ export default class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
+ipcMain.on('synchronous-message', (event, arg) => {
+  console.log('synchronous-message', arg);
+
+  event.returnValue = 'pong';
+});
+
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
+});
+
+ipcMain.handle('test-handle', async (event, ...args) => {
+  const result = await new Promise((resolve) =>
+    setTimeout(() => resolve('vrau'), 3000)
+  );
+
+  return result;
 });
 
 if (process.env.NODE_ENV === 'production') {

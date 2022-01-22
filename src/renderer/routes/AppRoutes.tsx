@@ -1,5 +1,7 @@
 import { Routes as Switch, Route } from 'react-router-dom';
 
+import { Notes } from 'renderer/pages/Notes';
+import { Rest } from 'renderer/pages/Rest';
 import { Table } from '../pages/Table';
 import { Home } from '../pages/Home';
 import { Connections } from '../pages/Connections';
@@ -10,6 +12,7 @@ export function AppRoutes(): JSX.Element {
   return (
     <Switch>
       <Route path="/" element={<Home />} />
+
       <Route path="/connections" element={<Connections />} />
       <Route
         path="/connections/:connection_id/databases"
@@ -23,6 +26,10 @@ export function AppRoutes(): JSX.Element {
         path="/connections/:connection_id/databases/:database_id/tables/:table_id"
         element={<Table />}
       />
+
+      <Route path="/notes" element={<Notes />} />
+
+      <Route path="/rest" element={<Rest />} />
     </Switch>
   );
 }

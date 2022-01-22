@@ -30,7 +30,7 @@ export function Modal({
           background: '#ffffff',
           borderRadius: 0,
           border: 'none',
-          padding: 16,
+          padding: 32,
           width: 448,
 
           display: 'flex',
@@ -41,7 +41,7 @@ export function Modal({
         },
       }}
     >
-      <div className="mb-12 flex justify-between items-start">
+      <div className="mb-8 flex justify-between items-start">
         <span className="text-3xl">{title}</span>
 
         <button type="button" className="h-6 w-6" onClick={onRequestClose}>

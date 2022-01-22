@@ -33,13 +33,13 @@ export function Input({
   }, [fieldName, registerField]);
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className={`flex flex-col gap-1 ${className}`}>
       {label && <label htmlFor={fieldName}>{label}</label>}
 
       <input
         id={fieldName}
         ref={inputRef}
-        className={`h-10 bg-pink-300 px-4 text-slate-900 placeholder:text-slate-400 ${className}`}
+        className="h-10 bg-pink-300 px-4 text-slate-900 placeholder:text-slate-400"
         defaultValue={defaultValue}
         {...rest}
       />

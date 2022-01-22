@@ -2,6 +2,12 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
+    invoke() {
+      return ipcRenderer.invoke('test-handle');
+    },
+    sendSync() {
+      return ipcRenderer.sendSync('synchronous-message', 'ping');
+    },
     myPing() {
       ipcRenderer.send('ipc-example', 'ping');
     },

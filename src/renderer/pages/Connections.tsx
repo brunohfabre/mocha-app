@@ -1,11 +1,72 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+
+import { Form } from '@unform/web';
+
 import { Button } from 'renderer/components/Button';
 import { Input } from 'renderer/components/Input';
 import { Modal } from 'renderer/components/Modal';
+import { FormHandles } from '@unform/core';
+
+interface FormData {
+  name: string;
+  host: string;
+  port: string;
+  user: string;
+  password: string;
+}
+
+interface SearchFormData {
+  search: string;
+}
+
+type ConnectionType = 'postgres' | 'mysql' | 'mariadb';
+
+function ConnectionTypeButton({
+  type,
+  isActive,
+  onClick,
+}: {
+  type: ConnectionType;
+  isActive: boolean;
+  onClick: (type: ConnectionType) => void;
+}): JSX.Element {
+  return (
+    <button
+      type="button"
+      onClick={() => onClick(type)}
+      className={`h-32 ${isActive ? 'bg-gray-400' : 'bg-gray-200'}`}
+    >
+      {type}
+    </button>
+  );
+}
 
 export function Connections(): JSX.Element {
+  const formRef = useRef<FormHandles>(null);
+  const searchFormRef = useRef<FormHandles>(null);
+
   const [modalVisible, setModalVisible] = useState(false);
+  const [typeSelected, setTypeSelected] = useState<ConnectionType>('postgres');
+
+  async function handleSubmit(data: FormData): Promise<void> {
+    console.log(data);
+  }
+
+  async function handleSubmitSearch(data: SearchFormData): Promise<void> {
+    console.log(data);
+  }
+
+  async function handleTestConnection(): Promise<void> {
+    const resp1 = await window.electron.ipcRenderer.invoke();
+    console.log(resp1);
+
+    const resp2 = await window.electron.ipcRenderer.invoke();
+    console.log(resp2);
+
+    const resp3 = await window.electron.ipcRenderer.invoke();
+    console.log(resp3);
+  }
 
   return (
     <>
@@ -14,37 +75,88 @@ export function Connections(): JSX.Element {
         onRequestClose={() => setModalVisible(false)}
         title="Add connection"
       >
-        <div className="flex flex-col gap-3">
-          <div>
-            <Input placeholder="name" className="w-full" />
-          </div>
-          <div className="grid grid-cols-4 gap-2">
-            <Input placeholder="host" className="col-span-3" />
-            <Input placeholder="port" />
-          </div>
-          <div>
-            <Input placeholder="user" className="w-full" />
-          </div>
-          <div>
-            <Input placeholder="password" className="w-full" />
-          </div>
+        <div className="grid grid-cols-3 gap-2">
+          <ConnectionTypeButton
+            type="postgres"
+            onClick={(type) => setTypeSelected(type)}
+            isActive={typeSelected === 'postgres'}
+          />
+          <ConnectionTypeButton
+            type="mysql"
+            onClick={(type) => setTypeSelected(type)}
+            isActive={typeSelected === 'mysql'}
+          />
+          <ConnectionTypeButton
+            type="mariadb"
+            onClick={(type) => setTypeSelected(type)}
+            isActive={typeSelected === 'mariadb'}
+          />
         </div>
 
-        <footer className="mt-12 flex justify-between">
-          <Button onClick={() => setModalVisible(false)}>test</Button>
-
-          <div className="flex gap-2">
-            <Button onClick={() => setModalVisible(false)}>cancel</Button>
-            <Button onClick={() => setModalVisible(false)}>add</Button>
+        <Form ref={formRef} onSubmit={handleSubmit} className="mt-4">
+          <div className="flex flex-col gap-2">
+            <div>
+              <Input
+                name="name"
+                placeholder="Name"
+                label="Name"
+                className="w-full"
+              />
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              <Input
+                name="host"
+                placeholder="Host"
+                label="Host"
+                className="col-span-3"
+              />
+              <Input name="port" placeholder="Port" label="Port" />
+            </div>
+            <div>
+              <Input
+                name="user"
+                placeholder="User"
+                label="User"
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Input
+                name="password"
+                placeholder="Password"
+                label="Password"
+                className="w-full"
+              />
+            </div>
           </div>
-        </footer>
+
+          <footer className="mt-8 flex justify-between">
+            <Button type="button" onClick={handleTestConnection}>
+              test
+            </Button>
+
+            <div className="flex gap-2">
+              <Button type="button" onClick={() => setModalVisible(false)}>
+                cancel
+              </Button>
+
+              <Button type="submit">add</Button>
+            </div>
+          </footer>
+        </Form>
       </Modal>
 
-      <header className="p-4 flex justify-between">
-        <Input placeholder="search" />
+      <Form
+        ref={searchFormRef}
+        onSubmit={handleSubmitSearch}
+        className="p-4 flex justify-between"
+      >
+        <Input name="search" placeholder="search" className="w-80" />
 
-        <Button onClick={() => setModalVisible(true)}>add connection</Button>
-      </header>
+        <Button type="button" onClick={() => setModalVisible(true)}>
+          add connection
+        </Button>
+      </Form>
 
       <div className="p-4 grid grid-cols-4 gap-2">
         <Link to="1/databases" className="p-4 bg-gray-300 flex flex-col gap-4">
