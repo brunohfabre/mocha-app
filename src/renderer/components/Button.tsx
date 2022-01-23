@@ -10,8 +10,6 @@ export function Button({
   type,
   children,
   className,
-  isLoading,
-  disabled,
   ...rest
 }: ButtonProps): JSX.Element {
   return (
@@ -19,9 +17,8 @@ export function Button({
       type={type}
       className={`px-6 bg-emerald-400 h-10 uppercase ${className}`}
       {...rest}
-      disabled={isLoading || disabled}
     >
-      {isLoading ? 'loading...' : children}
+      {children}
     </button>
   );
 }

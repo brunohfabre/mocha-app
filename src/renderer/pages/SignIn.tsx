@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom';
-import { useContext, useRef, useState } from 'react';
+import { useContext, useRef } from 'react';
 import * as Yup from 'yup';
 import { api } from 'renderer/services/api';
 import { AuthContext } from 'renderer/contexts/AuthContext';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
 import getValidationErrors from 'renderer/helpers/getValidationErrors';
+import { useLoading } from 'renderer/hooks/loadingHook';
 import { LinkButton } from '../components/LinkButton';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
@@ -22,7 +23,7 @@ export function SignIn(): JSX.Element {
 
   const { signIn } = useContext(AuthContext);
 
-  const [loading, setLoading] = useState(false);
+  const { setLoading } = useLoading();
 
   async function handleSubmit(data: FormData): Promise<void> {
     const { email, password } = data;
@@ -81,7 +82,7 @@ export function SignIn(): JSX.Element {
           <Input name="email" placeholder="Email" label="Email" />
           <Input name="password" placeholder="Password" label="Password" />
 
-          <Button type="submit" className="mt-8" isLoading={loading}>
+          <Button type="submit" className="mt-8">
             sign in
           </Button>
         </Form>

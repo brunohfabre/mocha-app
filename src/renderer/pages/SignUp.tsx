@@ -3,10 +3,11 @@ import * as Yup from 'yup';
 
 import { Form } from '@unform/web';
 
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { api } from 'renderer/services/api';
 import { FormHandles } from '@unform/core';
 import getValidationErrors from 'renderer/helpers/getValidationErrors';
+import { useLoading } from 'renderer/hooks/loadingHook';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { LinkButton } from '../components/LinkButton';
@@ -25,7 +26,7 @@ export function SignUp(): JSX.Element {
 
   const formRef = useRef<FormHandles>(null);
 
-  const [loading, setLoading] = useState(false);
+  const { setLoading } = useLoading();
 
   async function handleSubmit(data: FormData): Promise<void> {
     const { firstName, lastName, phone, email, password } = data;
@@ -98,7 +99,7 @@ export function SignUp(): JSX.Element {
             label="Confirm password"
           />
 
-          <Button type="submit" className="mt-8" isLoading={loading}>
+          <Button type="submit" className="mt-8">
             sign up
           </Button>
         </Form>

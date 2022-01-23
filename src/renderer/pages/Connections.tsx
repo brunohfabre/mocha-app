@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import * as Yup from 'yup';
 
 import { Form } from '@unform/web';
 
@@ -7,6 +8,9 @@ import { Button } from 'renderer/components/Button';
 import { Input } from 'renderer/components/Input';
 import { Modal } from 'renderer/components/Modal';
 import { FormHandles } from '@unform/core';
+import { useLoading } from 'renderer/hooks/loadingHook';
+import getValidationErrors from 'renderer/helpers/getValidationErrors';
+import { toast } from 'react-toastify';
 
 interface FormData {
   name: string;
@@ -46,6 +50,8 @@ export function Connections(): JSX.Element {
   const formRef = useRef<FormHandles>(null);
   const searchFormRef = useRef<FormHandles>(null);
 
+  const { setLoading } = useLoading();
+
   const [modalVisible, setModalVisible] = useState(false);
   const [typeSelected, setTypeSelected] = useState<ConnectionType>('postgres');
 
@@ -58,14 +64,47 @@ export function Connections(): JSX.Element {
   }
 
   async function handleTestConnection(): Promise<void> {
-    const resp1 = await window.electron.ipcRenderer.invoke();
-    console.log(resp1);
+    try {
+      const data = formRef.current?.getData();
 
-    const resp2 = await window.electron.ipcRenderer.invoke();
-    console.log(resp2);
+      const { host, port, user, password } = data as FormData;
 
-    const resp3 = await window.electron.ipcRenderer.invoke();
-    console.log(resp3);
+      formRef.current?.setErrors({});
+
+      const schema = Yup.object().shape({
+        host: Yup.string().required(),
+        port: Yup.string().required(),
+        user: Yup.string().required(),
+        password: Yup.string().required(),
+      });
+
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+
+      setLoading(true);
+
+      await window.electron.invoke('test-connection', {
+        type: typeSelected === 'mariadb' ? 'mysql' : typeSelected,
+        host,
+        port: Number(port),
+        user,
+        password,
+      });
+
+      toast.success('Successfully connected.');
+    } catch (err: any) {
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
+
+        formRef.current?.setErrors(errors);
+        return;
+      }
+
+      toast.error(err.message.split('Error:')[1].trimStart());
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -87,7 +126,7 @@ export function Connections(): JSX.Element {
             isActive={typeSelected === 'mysql'}
           />
           <ConnectionTypeButton
-            type="mariadb"
+            type="mysql"
             onClick={(type) => setTypeSelected(type)}
             isActive={typeSelected === 'mariadb'}
           />

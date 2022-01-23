@@ -6,6 +6,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { AppProvider } from './contexts';
+import { HooksProvider } from './hooks';
 
 import { Routes } from './routes';
 
@@ -19,9 +20,11 @@ export function App() {
       <ToastContainer />
 
       <Router>
-        <AppProvider>
-          <Routes />
-        </AppProvider>
+        <HooksProvider>
+          <AppProvider>
+            <Routes />
+          </AppProvider>
+        </HooksProvider>
       </Router>
     </>
   );

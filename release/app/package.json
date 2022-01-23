@@ -13,6 +13,10 @@
     "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts",
     "postinstall": "npm run electron-rebuild && npm run link-modules"
   },
-  "dependencies": {},
+  "dependencies": {
+    "knex": "^1.0.1",
+    "mysql": "^2.18.1",
+    "pg": "^8.7.1"
+  },
   "license": "MIT"
 }
