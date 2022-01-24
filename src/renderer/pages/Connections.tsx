@@ -126,7 +126,7 @@ export function Connections(): JSX.Element {
             isActive={typeSelected === 'mysql'}
           />
           <ConnectionTypeButton
-            type="mysql"
+            type="mariadb"
             onClick={(type) => setTypeSelected(type)}
             isActive={typeSelected === 'mariadb'}
           />
