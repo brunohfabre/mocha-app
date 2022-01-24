@@ -9,7 +9,7 @@ api.interceptors.request.use(async (config) => {
   const token = localStorage.getItem('@mocha:token');
 
   if (token && config.headers) {
-    config.headers.authorization = token;
+    config.headers.authorization = `Bearer ${token}`;
   }
 
   return config;

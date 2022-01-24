@@ -1,15 +1,15 @@
 import { useNavigate } from 'react-router-dom';
-import { useContext, useRef } from 'react';
+import { useContext, useRef, useState } from 'react';
 import * as Yup from 'yup';
 import { api } from 'renderer/services/api';
 import { AuthContext } from 'renderer/contexts/AuthContext';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
 import getValidationErrors from 'renderer/helpers/getValidationErrors';
-import { useLoading } from 'renderer/hooks/loadingHook';
 import { LinkButton } from '../components/LinkButton';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
+import { Spin } from '../components/Spin';
 
 interface FormData {
   email: string;
@@ -23,7 +23,7 @@ export function SignIn(): JSX.Element {
 
   const { signIn } = useContext(AuthContext);
 
-  const { setLoading } = useLoading();
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(data: FormData): Promise<void> {
     const { email, password } = data;
@@ -40,7 +40,7 @@ export function SignIn(): JSX.Element {
         abortEarly: false,
       });
 
-      setLoading(true);
+      setIsLoading(true);
 
       const response = await api.post('/sessions', {
         email,
@@ -55,50 +55,54 @@ export function SignIn(): JSX.Element {
         formRef.current?.setErrors(errors);
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center">
-      <div className="p-8 flex flex-col max-w-sm w-full">
-        <h1 className="text-4xl font-bold self-center">Sign In</h1>
+    <>
+      <Spin spinning={isLoading} />
 
-        <Button
-          type="button"
-          className="mt-12"
-          onClick={() => window.alert('Under contruction.')}
-        >
-          continue with github
-        </Button>
+      <div className="h-screen flex flex-col items-center justify-center">
+        <div className="p-8 flex flex-col max-w-sm w-full">
+          <h1 className="text-4xl font-bold self-center">Sign In</h1>
 
-        <span className="flex justify-center my-4">or</span>
-
-        <Form
-          ref={formRef}
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-2 "
-        >
-          <Input name="email" placeholder="Email" label="Email" />
-          <Input name="password" placeholder="Password" label="Password" />
-
-          <Button type="submit" className="mt-8">
-            sign in
+          <Button
+            type="button"
+            className="mt-12"
+            onClick={() => window.alert('Under contruction.')}
+          >
+            continue with github
           </Button>
-        </Form>
 
-        <LinkButton
-          className="mt-8"
-          onClick={() => window.alert('Under contruction.')}
-        >
-          Forgot password?
-        </LinkButton>
+          <span className="flex justify-center my-4">or</span>
 
-        <span className="self-center mt-8">
-          Don&apos;t have account?{' '}
-          <LinkButton onClick={() => navigate('signup')}>Sign up</LinkButton>
-        </span>
+          <Form
+            ref={formRef}
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-2 "
+          >
+            <Input name="email" placeholder="Email" label="Email" />
+            <Input name="password" placeholder="Password" label="Password" />
+
+            <Button type="submit" className="mt-8">
+              sign in
+            </Button>
+          </Form>
+
+          <LinkButton
+            className="mt-8"
+            onClick={() => window.alert('Under contruction.')}
+          >
+            Forgot password?
+          </LinkButton>
+
+          <span className="self-center mt-8">
+            Don&apos;t have account?{' '}
+            <LinkButton onClick={() => navigate('signup')}>Sign up</LinkButton>
+          </span>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

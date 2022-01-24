@@ -3,14 +3,14 @@ import * as Yup from 'yup';
 
 import { Form } from '@unform/web';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { api } from 'renderer/services/api';
 import { FormHandles } from '@unform/core';
 import getValidationErrors from 'renderer/helpers/getValidationErrors';
-import { useLoading } from 'renderer/hooks/loadingHook';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { LinkButton } from '../components/LinkButton';
+import { Spin } from '../components/Spin';
 
 interface FormData {
   firstName: string;
@@ -26,7 +26,7 @@ export function SignUp(): JSX.Element {
 
   const formRef = useRef<FormHandles>(null);
 
-  const { setLoading } = useLoading();
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(data: FormData): Promise<void> {
     const { firstName, lastName, phone, email, password } = data;
@@ -50,7 +50,7 @@ export function SignUp(): JSX.Element {
         abortEarly: false,
       });
 
-      setLoading(true);
+      setIsLoading(true);
 
       await api.post('/users', {
         firstName,
@@ -70,45 +70,53 @@ export function SignUp(): JSX.Element {
         formRef.current?.setErrors(errors);
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center">
-      <div className="p-8 flex flex-col max-w-sm w-full">
-        <h1 className="text-4xl font-bold self-center">Sign Up</h1>
+    <>
+      <Spin spinning={isLoading} />
 
-        <Form
-          ref={formRef}
-          onSubmit={handleSubmit}
-          className="mt-8 flex flex-col gap-2"
-        >
-          <Input name="firstName" placeholder="First name" label="First name" />
-          <Input name="lastName" placeholder="Last name" label="Last name" />
-          <Input
-            name="phone"
-            placeholder="Mobile phone with country"
-            label="Phone"
-          />
-          <Input name="email" placeholder="Email" label="Email" />
-          <Input name="password" placeholder="Password" label="Password" />
-          <Input
-            name="confirmPassword"
-            placeholder="Confirm password"
-            label="Confirm password"
-          />
+      <div className="h-screen flex flex-col items-center justify-center">
+        <div className="p-8 flex flex-col max-w-sm w-full">
+          <h1 className="text-4xl font-bold self-center">Sign Up</h1>
 
-          <Button type="submit" className="mt-8">
-            sign up
-          </Button>
-        </Form>
+          <Form
+            ref={formRef}
+            onSubmit={handleSubmit}
+            className="mt-8 flex flex-col gap-2"
+          >
+            <Input
+              name="firstName"
+              placeholder="First name"
+              label="First name"
+            />
+            <Input name="lastName" placeholder="Last name" label="Last name" />
+            <Input
+              name="phone"
+              placeholder="Mobile phone with country"
+              label="Phone"
+            />
+            <Input name="email" placeholder="Email" label="Email" />
+            <Input name="password" placeholder="Password" label="Password" />
+            <Input
+              name="confirmPassword"
+              placeholder="Confirm password"
+              label="Confirm password"
+            />
 
-        <span className="self-center mt-8">
-          Already have an account?{' '}
-          <LinkButton onClick={() => navigate(-1)}>Sign in</LinkButton>
-        </span>
+            <Button type="submit" className="mt-8">
+              sign up
+            </Button>
+          </Form>
+
+          <span className="self-center mt-8">
+            Already have an account?{' '}
+            <LinkButton onClick={() => navigate(-1)}>Sign in</LinkButton>
+          </span>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
