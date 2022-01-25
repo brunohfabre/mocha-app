@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import * as Yup from 'yup';
-
 import { Form } from '@unform/web';
 
 import { Button } from 'renderer/components/Button';
@@ -13,6 +11,7 @@ import { FormHandles } from '@unform/core';
 import getValidationErrors from 'renderer/helpers/getValidationErrors';
 import { toast } from 'react-toastify';
 import { api } from 'renderer/services/api';
+import { ConnectionItem } from './ConnectionItem';
 
 interface FormData {
   name: string;
@@ -238,6 +237,7 @@ export function Connections(): JSX.Element {
                 placeholder="Name"
                 label="Name"
                 className="w-full"
+                autoFocus
               />
             </div>
             <div className="grid grid-cols-4 gap-2">
@@ -314,21 +314,15 @@ export function Connections(): JSX.Element {
 
       <div className="p-4 grid grid-cols-4 gap-2">
         {connections.map((connection) => (
-          <Link
-            to="1/databases"
-            className="p-4 bg-gray-300 flex flex-col gap-4"
+          <ConnectionItem
             key={connection.id}
-          >
-            <header className="flex justify-between">
-              <span>{connection.name}</span>
-
-              <span>{connection.type}</span>
-            </header>
-
-            <div>
-              {connection.host}:{connection.port}
-            </div>
-          </Link>
+            connection={connection}
+            onDelete={() => {
+              setConnections((state) =>
+                state.filter((item) => item.id !== connection.id)
+              );
+            }}
+          />
         ))}
       </div>
     </>
