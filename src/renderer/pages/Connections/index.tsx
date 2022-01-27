@@ -66,8 +66,30 @@ export function Connections(): JSX.Element {
   const [modalVisible, setModalVisible] = useState(false);
   const [typeSelected, setTypeSelected] = useState<ConnectionType>('POSTGRES');
   const [connections, setConnections] = useState<Connection[]>([]);
+  const [filteredConnections, setFilteredConnections] = useState<Connection[]>(
+    []
+  );
   const [connectionHasBeenTested, setConnectionHasBeenTested] = useState(false);
   const [withoutTestingAlert, setWithoutTestingAlert] = useState(false);
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    setFilteredConnections(connections);
+
+    setSearch('');
+  }, [connections]);
+
+  useEffect(() => {
+    function handleSearch(): void {
+      setFilteredConnections(
+        connections.filter((connection) =>
+          connection.name.toLowerCase().includes(search.toLowerCase())
+        )
+      );
+    }
+
+    handleSearch();
+  }, [search, connections]);
 
   useEffect(() => {
     async function loadConnections(): Promise<void> {
@@ -152,10 +174,6 @@ export function Connections(): JSX.Element {
     }
   }
 
-  async function handleSubmitSearch(data: SearchFormData): Promise<void> {
-    console.log(data);
-  }
-
   async function handleTestConnection(): Promise<void> {
     try {
       const data = formRef.current?.getData();
@@ -178,7 +196,7 @@ export function Connections(): JSX.Element {
       setIsLoading(true);
 
       await window.electron.invoke('test-connection', {
-        type: typeSelected === 'MARIADB' ? 'mysql' : typeSelected.toLowerCase(),
+        type: typeSelected,
         host,
         port: Number(port),
         user,
@@ -196,7 +214,9 @@ export function Connections(): JSX.Element {
         return;
       }
 
-      toast.error(err.message.split('Error:')[1].trimStart());
+      console.log(err.message);
+
+      toast.error(err.message.toLowerCase().split('error:')[1].trimStart());
     } finally {
       setIsLoading(false);
     }
@@ -302,10 +322,16 @@ export function Connections(): JSX.Element {
 
       <Form
         ref={searchFormRef}
-        onSubmit={handleSubmitSearch}
+        onSubmit={() => undefined}
         className="p-4 flex justify-between"
       >
-        <Input name="search" placeholder="search" className="w-80" />
+        <Input
+          name="search"
+          placeholder="search"
+          className="w-80"
+          onChange={(e) => setSearch(e.target.value)}
+          autoFocus
+        />
 
         <Button type="button" onClick={() => setModalVisible(true)}>
           add connection
@@ -313,7 +339,7 @@ export function Connections(): JSX.Element {
       </Form>
 
       <div className="p-4 grid grid-cols-4 gap-2">
-        {connections.map((connection) => (
+        {filteredConnections.map((connection) => (
           <ConnectionItem
             key={connection.id}
             connection={connection}

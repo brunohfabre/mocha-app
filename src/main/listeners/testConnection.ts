@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 
 import knex from 'knex';
 
-type ConnectionType = 'postgres' | 'mysql';
+type ConnectionType = 'POSTGRES' | 'MYSQL' | 'MARIADB';
 
 interface TestConnectionData {
   type: ConnectionType;
@@ -19,7 +19,7 @@ export function testConnection(): void {
       const { type, host, port, user, password } = data;
 
       const connection = knex({
-        client: type,
+        client: type === 'MARIADB' ? 'mysql' : type.toLowerCase(),
         connection: {
           host,
           port,

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
@@ -40,6 +40,8 @@ export function ConnectionItem({
   connection,
   onDelete,
 }: ConnectionItemProps): JSX.Element {
+  const navigate = useNavigate();
+
   const formRef = useRef<FormHandles>(null);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -65,6 +67,8 @@ export function ConnectionItem({
 
       setIsLoading(true);
 
+      await window.electron.invoke('destroy-connection', { id: connection.id });
+
       await api.delete(`/connections/${connection.id}`);
 
       onDelete();
@@ -80,6 +84,22 @@ export function ConnectionItem({
       }
 
       toast.error(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleConnect(): Promise<void> {
+    try {
+      setIsLoading(true);
+
+      await window.electron.invoke('connect', connection);
+
+      navigate(`${connection.id}/databases`);
+    } catch (err: any) {
+      console.log(err.message);
+
+      toast.error(err.message.toLowerCase().split('error:')[1].trimStart());
     } finally {
       setIsLoading(false);
     }
@@ -115,21 +135,21 @@ export function ConnectionItem({
       </Alert>
 
       <ContextMenuTrigger id={connection.id}>
-        <Link
-          to="1/databases"
-          className="p-4 bg-gray-300 flex flex-col gap-4"
+        <button
           key={connection.id}
+          className="p-4 bg-gray-300 flex flex-col gap-4"
+          onClick={handleConnect}
         >
           <header className="flex justify-between">
-            <span>{connection.name}</span>
+            <span className="text-left">{connection.name}</span>
 
-            <span>{connection.type}</span>
+            <span className="text-right">{connection.type}</span>
           </header>
 
           <div>
             {connection.host}:{connection.port}
           </div>
-        </Link>
+        </button>
       </ContextMenuTrigger>
 
       <ContextMenu id={connection.id} className="bg-white py-2 shadow-md w-40">
