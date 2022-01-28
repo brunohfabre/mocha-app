@@ -56,13 +56,26 @@ export function Tables(): JSX.Element {
     editorRef.current = editor;
   }
 
-  function showValue() {
+  async function showValue() {
     if (editorRef.current) {
-      const value = editorRef.current
-        .getModel()
-        .getValueInRange(editorRef.current.getSelection());
+      try {
+        setIsLoading(true);
 
-      alert(value.trim());
+        const value = editorRef.current
+          .getModel()
+          .getValueInRange(editorRef.current.getSelection());
+
+        const response = await window.electron.invoke('run-query', {
+          connectionId,
+          query: value,
+        });
+
+        console.log(response);
+      } catch (err: any) {
+        console.log(err.message);
+      } finally {
+        setIsLoading(false);
+      }
     }
   }
 
@@ -70,20 +83,16 @@ export function Tables(): JSX.Element {
     <>
       <Spin spinning={isLoading} />
 
-      <div className="flex-1 flex">
+      <div className="flex-1 flex overflow-y-auto">
         <Insidebar functions={functions} tables={tables} />
 
         <div className="flex-1 flex flex-col">
           <Tabs />
 
-          <section className="flex-1 bg-teal-100 p-4 flex flex-col justify-between gap-4">
-            <Editor
-              defaultLanguage="sql"
-              defaultValue="// some comment"
-              onMount={handleEditorDidMount}
-            />
+          <section className="flex-1 bg-teal-100 flex flex-col justify-between">
+            <Editor defaultLanguage="sql" onMount={handleEditorDidMount} />
 
-            <div className="ml-auto flex items-center gap-8">
+            <div className="ml-auto flex items-center gap-8 p-4">
               <span className="flex items-center gap-2">
                 {/* <Input type="checkbox" id="check" /> */}
                 Limit to 100 rows

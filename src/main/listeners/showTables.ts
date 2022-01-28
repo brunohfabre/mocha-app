@@ -34,11 +34,11 @@ export function showTables(): void {
         connection.info.type === 'MYSQL' ||
         connection.info.type === 'MARIADB'
       ) {
-        // const [rows] = await connection.connection.raw('show tables;');
-        // tables = rows.map((item: { Database: string }) => ({
-        //   name: item.Database,
-        //   tablesCount: 'TODO',
-        // }));
+        const [rows] = await connection.connection.raw(
+          `SELECT table_name FROM information_schema.tables WHERE table_schema = '${connection.info.database}';`
+        );
+
+        tables = rows.map((item: { table_name: string }) => item.table_name);
       }
 
       return tables;

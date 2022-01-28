@@ -9,7 +9,7 @@ interface AccordionProps {
 }
 
 function Accordion({ children }: AccordionProps): JSX.Element {
-  return <div className="mt-4">{children}</div>;
+  return <div className="mt-4 overflow-y-auto">{children}</div>;
 }
 
 interface AccordionTitleProps {
@@ -62,7 +62,7 @@ export function Insidebar({ functions, tables }: InsidebarProps): JSX.Element {
   const formRef = useRef<FormHandles>(null);
 
   return (
-    <aside className="bg-gray-300 w-60 p-4 flex flex-col">
+    <aside className="bg-gray-300 w-60 p-4 flex flex-col overflow-y-auto">
       <Form ref={formRef} onSubmit={() => undefined}>
         <Input name="search" placeholder="search" />
       </Form>

@@ -4,6 +4,7 @@ import { connect } from './connect';
 import { showDatabases } from './showDatabases';
 import { selectDatabase } from './selectDatabase';
 import { showTables } from './showTables';
+import { runQuery } from './runQuery';
 
 export function registerListeners(): void {
   testConnection();
@@ -12,4 +13,5 @@ export function registerListeners(): void {
   showDatabases();
   selectDatabase();
   showTables();
+  runQuery();
 }
