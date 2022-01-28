@@ -1,4 +1,6 @@
-import { ReactNode } from 'react';
+import { FormHandles } from '@unform/core';
+import { Form } from '@unform/web';
+import { ReactNode, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Input } from './Input';
 
@@ -41,32 +43,49 @@ interface AccordionItemProps {
 
 function AccordionItem({ children }: AccordionItemProps): JSX.Element {
   return (
-    <Link className="h-8 flex items-center ml-4" to="1">
+    <button
+      type="button"
+      className="h-8 flex items-center ml-4"
+      onClick={() => window.alert('Under construction.')}
+    >
       {children}
-    </Link>
+    </button>
   );
 }
 
-export function Insidebar(): JSX.Element {
+interface InsidebarProps {
+  functions: string[];
+  tables: string[];
+}
+
+export function Insidebar({ functions, tables }: InsidebarProps): JSX.Element {
+  const formRef = useRef<FormHandles>(null);
+
   return (
     <aside className="bg-gray-300 w-60 p-4 flex flex-col">
-      <Input placeholder="search" />
+      <Form ref={formRef} onSubmit={() => undefined}>
+        <Input name="search" placeholder="search" />
+      </Form>
 
-      <Accordion>
-        <AccordionTitle>functions</AccordionTitle>
+      {!!functions.length && (
+        <Accordion>
+          <AccordionTitle>functions</AccordionTitle>
 
-        {new Array(3).fill('f').map((_, index) => (
-          <AccordionItem>function_name #{index + 1}</AccordionItem>
-        ))}
-      </Accordion>
+          {functions.map((item) => (
+            <AccordionItem key={item}>{item}</AccordionItem>
+          ))}
+        </Accordion>
+      )}
 
-      <Accordion>
-        <AccordionTitle>tables</AccordionTitle>
+      {!!tables.length && (
+        <Accordion>
+          <AccordionTitle>tables</AccordionTitle>
 
-        {new Array(7).fill('t').map((_, index) => (
-          <AccordionItem>table_name #{index + 1}</AccordionItem>
-        ))}
-      </Accordion>
+          {tables.map((item) => (
+            <AccordionItem key={item}>{item}</AccordionItem>
+          ))}
+        </Accordion>
+      )}
     </aside>
   );
 }

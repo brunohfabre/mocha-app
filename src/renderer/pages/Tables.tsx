@@ -1,13 +1,21 @@
 import Editor from '@monaco-editor/react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Button } from 'renderer/components/Button';
-import { Input } from 'renderer/components/Input';
 import { Insidebar } from 'renderer/components/Insidebar';
 import { Tabs } from 'renderer/components/Tabs';
+import { Spin } from 'renderer/components/Spin';
+import { useParams } from 'react-router-dom';
 
 export function Tables(): JSX.Element {
+  const { connection_id: connectionId } =
+    useParams<{ connection_id: string }>();
+
   const editorRef = useRef<any>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [functions, setFunctions] = useState<string[]>([]);
+  const [tables, setTables] = useState<string[]>([]);
 
   useEffect(() => {
     window.addEventListener('resize', () => {
@@ -15,6 +23,7 @@ export function Tables(): JSX.Element {
         width: 'auto',
         height: 'auto',
       });
+
       // const { width, height } = editorEl.getBoundingClientRect();
       // editorRef.current.layout({
       //   width,
@@ -22,6 +31,26 @@ export function Tables(): JSX.Element {
       // });
     });
   }, []);
+
+  useEffect(() => {
+    async function loadTables(): Promise<void> {
+      try {
+        setIsLoading(true);
+
+        const response = await window.electron.invoke('show-tables', {
+          connectionId,
+        });
+
+        setTables(response);
+      } catch (err: any) {
+        console.log(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadTables();
+  }, [connectionId]);
 
   function handleEditorDidMount(editor: any, monaco: any) {
     editorRef.current = editor;
@@ -38,39 +67,45 @@ export function Tables(): JSX.Element {
   }
 
   return (
-    <div className="flex-1 flex">
-      <Insidebar />
+    <>
+      <Spin spinning={isLoading} />
 
-      <div className="flex-1 flex flex-col">
-        <Tabs />
+      <div className="flex-1 flex">
+        <Insidebar functions={functions} tables={tables} />
 
-        <section className="flex-1 bg-teal-100 p-4 flex flex-col justify-between gap-4">
-          <Editor
-            defaultLanguage="sql"
-            defaultValue="// some comment"
-            onMount={handleEditorDidMount}
-          />
+        <div className="flex-1 flex flex-col">
+          <Tabs />
 
-          <div className="ml-auto flex items-center gap-8">
-            <span className="flex items-center gap-2">
-              <Input type="checkbox" id="check" />
-              Limit to 100 rows
-            </span>
+          <section className="flex-1 bg-teal-100 p-4 flex flex-col justify-between gap-4">
+            <Editor
+              defaultLanguage="sql"
+              defaultValue="// some comment"
+              onMount={handleEditorDidMount}
+            />
 
-            <Button onClick={showValue}>run query</Button>
-          </div>
-        </section>
+            <div className="ml-auto flex items-center gap-8">
+              <span className="flex items-center gap-2">
+                {/* <Input type="checkbox" id="check" /> */}
+                Limit to 100 rows
+              </span>
 
-        <section className="flex-1 flex flex-col">
-          <div className="bg-orange-100 flex-1 p-4">result of query</div>
+              <Button type="button" onClick={showValue}>
+                run query
+              </Button>
+            </div>
+          </section>
 
-          <footer className="bg-orange-200 h-10 px-4 flex items-center gap-4">
-            <span>rows_count</span>
+          <section className="flex-1 flex flex-col">
+            <div className="bg-orange-100 flex-1 p-4">result of query</div>
 
-            <span>response_time</span>
-          </footer>
-        </section>
+            <footer className="bg-orange-200 h-10 px-4 flex items-center gap-4">
+              <span>rows_count</span>
+
+              <span>response_time</span>
+            </footer>
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

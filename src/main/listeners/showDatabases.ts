@@ -13,7 +13,7 @@ type DatabaseType = {
 export function showDatabases(): void {
   ipcMain.handle(
     'show-databases',
-    async (_, data: ShowDatabasesData): Promise<void> => {
+    async (_, data: ShowDatabasesData): Promise<DatabaseType[]> => {
       const { connectionId } = data;
 
       const connection = connections[connectionId];

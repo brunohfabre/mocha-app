@@ -70,7 +70,7 @@ export function SignIn(): JSX.Element {
           <Button
             type="button"
             className="mt-12"
-            onClick={() => window.alert('Under contruction.')}
+            onClick={() => window.alert('Under construction.')}
           >
             continue with github
           </Button>
@@ -92,7 +92,7 @@ export function SignIn(): JSX.Element {
 
           <LinkButton
             className="mt-8"
-            onClick={() => window.alert('Under contruction.')}
+            onClick={() => window.alert('Under construction.')}
           >
             Forgot password?
           </LinkButton>

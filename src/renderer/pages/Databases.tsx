@@ -1,7 +1,7 @@
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { useEffect, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { Button } from 'renderer/components/Button';
@@ -15,6 +15,7 @@ type DatabaseType = {
 };
 
 export function Databases(): JSX.Element {
+  const navigate = useNavigate();
   const { connection_id: connectionId } =
     useParams<{ connection_id: string }>();
 
@@ -71,6 +72,25 @@ export function Databases(): JSX.Element {
     handleSearch();
   }, [search, databases]);
 
+  async function handleSelectDatabase(database: string): Promise<void> {
+    try {
+      setIsLoading(true);
+
+      console.log(connectionId, database);
+
+      await window.electron.invoke('select-database', {
+        connectionId,
+        database,
+      });
+
+      navigate(`${database}/tables`);
+    } catch (err: any) {
+      console.log(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <>
       <Spin spinning={isLoading} />
@@ -103,11 +123,16 @@ export function Databases(): JSX.Element {
 
       <div className="p-4 grid grid-cols-4 gap-2">
         {filteredDatabases.map((database) => (
-          <Link to="1/tables" className="p-4 bg-gray-300 flex justify-between">
+          <button
+            type="button"
+            key={database.name}
+            className="p-4 bg-gray-300 flex justify-between"
+            onClick={() => handleSelectDatabase(database.name)}
+          >
             <span>{database.name}</span>
 
             <span>{database.tablesCount} tables</span>
-          </Link>
+          </button>
         ))}
       </div>
     </>

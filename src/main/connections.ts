@@ -13,6 +13,7 @@ interface Connection {
       port: number;
       user: string;
       password: string;
+      database?: string;
     };
   };
 }

@@ -134,13 +134,18 @@ export function ConnectionItem({
         </Form>
       </Alert>
 
-      <ContextMenuTrigger id={connection.id}>
+      <ContextMenuTrigger
+        id={connection.id}
+        attributes={{
+          className: 'flex',
+        }}
+      >
         <button
           key={connection.id}
-          className="p-4 bg-gray-300 flex flex-col gap-4"
+          className="flex-1 p-4 bg-gray-300 flex flex-col gap-4 justify-between"
           onClick={handleConnect}
         >
-          <header className="flex justify-between">
+          <header className="w-full flex justify-between">
             <span className="text-left">{connection.name}</span>
 
             <span className="text-right">{connection.type}</span>
