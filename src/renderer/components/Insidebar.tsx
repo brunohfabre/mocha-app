@@ -1,7 +1,6 @@
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { ReactNode, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import { Input } from './Input';
 
 interface AccordionProps {
