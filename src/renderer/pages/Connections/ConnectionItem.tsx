@@ -81,6 +81,7 @@ export function ConnectionItem({
         const errors = getValidationErrors(err);
 
         formRef.current?.setErrors(errors);
+        return;
       }
 
       toast.error(err.message);
