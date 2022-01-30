@@ -8,10 +8,10 @@ interface DefaultLayoutProps {
 
 export function DefaultLayout({ children }: DefaultLayoutProps): JSX.Element {
   return (
-    <div className="h-screen flex">
+    <div className="h-screen flex overflow-auto">
       <Sidebar />
 
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 overflow-auto">
         <Header />
 
         {children}

@@ -1,11 +1,12 @@
+import { useEffect, useRef, useState, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { Button } from 'renderer/components/Button';
 import { Insidebar } from 'renderer/components/Insidebar';
 import { Tabs } from 'renderer/components/Tabs';
 import { Spin } from 'renderer/components/Spin';
-import { useParams } from 'react-router-dom';
 
 export function Tables(): JSX.Element {
   const { connection_id: connectionId } =
@@ -56,7 +57,7 @@ export function Tables(): JSX.Element {
     editorRef.current = editor;
   }
 
-  async function showValue() {
+  async function handleRunQuery() {
     if (editorRef.current) {
       try {
         setIsLoading(true);
@@ -72,7 +73,7 @@ export function Tables(): JSX.Element {
 
         console.log(response);
       } catch (err: any) {
-        console.log(err.message);
+        toast.error(err.message.toLowerCase().split('error:')[1].trimStart());
       } finally {
         setIsLoading(false);
       }
@@ -83,10 +84,10 @@ export function Tables(): JSX.Element {
     <>
       <Spin spinning={isLoading} />
 
-      <div className="flex-1 flex overflow-y-auto">
+      <div className="flex-1 flex overflow-auto">
         <Insidebar functions={functions} tables={tables} />
 
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col overflow-auto">
           <Tabs />
 
           <section className="flex-1 bg-teal-100 flex flex-col justify-between">
@@ -98,14 +99,59 @@ export function Tables(): JSX.Element {
                 Limit to 100 rows
               </span>
 
-              <Button type="button" onClick={showValue}>
+              <Button type="button" onClick={handleRunQuery}>
                 run query
               </Button>
             </div>
           </section>
 
-          <section className="flex-1 flex flex-col">
-            <div className="bg-orange-100 flex-1 p-4">result of query</div>
+          <section className="flex-1 flex flex-col overflow-auto">
+            <div className="bg-orange-100 flex-1 w-full overflow-auto">
+              <table className="bg-red-400">
+                <thead>
+                  <tr>
+                    <th className="text-left whitespace-nowrap">title 1</th>
+                    <th className="text-left whitespace-nowrap">title 2</th>
+                    <th className="text-left whitespace-nowrap">title 3</th>
+                    <th className="text-left whitespace-nowrap">title 4</th>
+                    <th className="text-left whitespace-nowrap">title 1</th>
+                    <th className="text-left whitespace-nowrap">title 2</th>
+                    <th className="text-left whitespace-nowrap">title 3</th>
+                    <th className="text-left whitespace-nowrap">title 4</th>
+                    <th className="text-left whitespace-nowrap">title 1</th>
+                    <th className="text-left whitespace-nowrap">title 2</th>
+                    <th className="text-left whitespace-nowrap">title 3</th>
+                    <th className="text-left whitespace-nowrap">title 4</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td className="whitespace-nowrap">
+                      Lorem Ipsum is simply dummy text of the printing and
+                      typesetting industry.
+                    </td>
+                    <td className="whitespace-nowrap">item 2</td>
+                    <td className="whitespace-nowrap">item 3</td>
+                    <td className="whitespace-nowrap">item 4</td>
+                    <td className="whitespace-nowrap">
+                      Lorem Ipsum is simply dummy text of the printing and
+                      typesetting industry.
+                    </td>
+                    <td className="whitespace-nowrap">item 2</td>
+                    <td className="whitespace-nowrap">item 3</td>
+                    <td className="whitespace-nowrap">item 4</td>
+                    <td className="whitespace-nowrap">
+                      Lorem Ipsum is simply dummy text of the printing and
+                      typesetting industry.
+                    </td>
+                    <td className="whitespace-nowrap">item 2</td>
+                    <td className="whitespace-nowrap">item 3</td>
+                    <td className="whitespace-nowrap">item 4</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
             <footer className="bg-orange-200 h-10 px-4 flex items-center gap-4">
               <span>rows_count</span>
