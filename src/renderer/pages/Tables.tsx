@@ -7,6 +7,12 @@ import { Button } from 'renderer/components/Button';
 import { Insidebar } from 'renderer/components/Insidebar';
 import { Tabs } from 'renderer/components/Tabs';
 import { Spin } from 'renderer/components/Spin';
+import { Table } from 'renderer/components/Table';
+
+type FieldType = {
+  name: string;
+  type: string;
+};
 
 export function Tables(): JSX.Element {
   const { connection_id: connectionId } =
@@ -17,6 +23,8 @@ export function Tables(): JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
   const [functions, setFunctions] = useState<string[]>([]);
   const [tables, setTables] = useState<string[]>([]);
+  const [fields, setFields] = useState<FieldType[]>([]);
+  const [rows, setRows] = useState([]);
 
   useEffect(() => {
     window.addEventListener('resize', () => {
@@ -71,7 +79,8 @@ export function Tables(): JSX.Element {
           query: value,
         });
 
-        console.log(response);
+        setFields(response.fields);
+        setRows(response.rows);
       } catch (err: any) {
         toast.error(err.message.toLowerCase().split('error:')[1].trimStart());
       } finally {
@@ -79,6 +88,9 @@ export function Tables(): JSX.Element {
       }
     }
   }
+
+  console.log(fields);
+  console.log(rows);
 
   return (
     <>
@@ -107,50 +119,7 @@ export function Tables(): JSX.Element {
 
           <section className="flex-1 flex flex-col overflow-auto">
             <div className="bg-orange-100 flex-1 w-full overflow-auto">
-              <table className="bg-red-400">
-                <thead>
-                  <tr>
-                    <th className="text-left whitespace-nowrap">title 1</th>
-                    <th className="text-left whitespace-nowrap">title 2</th>
-                    <th className="text-left whitespace-nowrap">title 3</th>
-                    <th className="text-left whitespace-nowrap">title 4</th>
-                    <th className="text-left whitespace-nowrap">title 1</th>
-                    <th className="text-left whitespace-nowrap">title 2</th>
-                    <th className="text-left whitespace-nowrap">title 3</th>
-                    <th className="text-left whitespace-nowrap">title 4</th>
-                    <th className="text-left whitespace-nowrap">title 1</th>
-                    <th className="text-left whitespace-nowrap">title 2</th>
-                    <th className="text-left whitespace-nowrap">title 3</th>
-                    <th className="text-left whitespace-nowrap">title 4</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  <tr>
-                    <td className="whitespace-nowrap">
-                      Lorem Ipsum is simply dummy text of the printing and
-                      typesetting industry.
-                    </td>
-                    <td className="whitespace-nowrap">item 2</td>
-                    <td className="whitespace-nowrap">item 3</td>
-                    <td className="whitespace-nowrap">item 4</td>
-                    <td className="whitespace-nowrap">
-                      Lorem Ipsum is simply dummy text of the printing and
-                      typesetting industry.
-                    </td>
-                    <td className="whitespace-nowrap">item 2</td>
-                    <td className="whitespace-nowrap">item 3</td>
-                    <td className="whitespace-nowrap">item 4</td>
-                    <td className="whitespace-nowrap">
-                      Lorem Ipsum is simply dummy text of the printing and
-                      typesetting industry.
-                    </td>
-                    <td className="whitespace-nowrap">item 2</td>
-                    <td className="whitespace-nowrap">item 3</td>
-                    <td className="whitespace-nowrap">item 4</td>
-                  </tr>
-                </tbody>
-              </table>
+              <Table fields={fields} rows={rows} />
             </div>
 
             <footer className="bg-orange-200 h-10 px-4 flex items-center gap-4">
