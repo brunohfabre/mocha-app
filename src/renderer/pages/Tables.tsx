@@ -89,9 +89,6 @@ export function Tables(): JSX.Element {
     }
   }
 
-  console.log(fields);
-  console.log(rows);
-
   return (
     <>
       <Spin spinning={isLoading} />
