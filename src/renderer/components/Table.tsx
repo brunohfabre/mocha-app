@@ -1,3 +1,5 @@
+import { format } from 'date-fns';
+
 type FieldType = {
   name: string;
   type: string;
@@ -26,7 +28,11 @@ export function Table({ fields, rows }: TableProps): JSX.Element {
           <tr>
             {fields.map((field) => (
               <td className="whitespace-nowrap">
-                {JSON.stringify(row[field.name])}
+                {field.type === 'text'
+                  ? row[field.name]
+                  : field.type === 'timestamp'
+                  ? format(row[field.name], 'yyyy-MM-dd hh:mm:ss')
+                  : JSON.stringify(row[field.name])}
               </td>
             ))}
           </tr>

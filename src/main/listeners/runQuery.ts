@@ -1,4 +1,6 @@
 import { ipcMain } from 'electron';
+import postgresDataTypes from '../../renderer/assets/dataTypes/postgres.json';
+
 import { connections } from '../connections';
 
 interface ShowDatabasesData {
@@ -44,7 +46,7 @@ export function runQuery(): void {
           count: rowCount as number,
           fields: fields.map((field: any) => ({
             name: field.name,
-            type: field.format,
+            type: postgresDataTypes[field.dataTypeID] || 'unknow',
           })),
           rows,
         };
