@@ -1,6 +1,9 @@
+import { ReactNode, useRef } from 'react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import { ReactNode, useRef } from 'react';
+
+import { ResizableBox } from 'react-resizable';
+
 import { Input } from './Input';
 
 interface AccordionProps {
@@ -8,7 +11,7 @@ interface AccordionProps {
 }
 
 function Accordion({ children }: AccordionProps): JSX.Element {
-  return <div className="mt-4 overflow-y-auto">{children}</div>;
+  return <div className="mt-4 overflow-y-auto tables-test">{children}</div>;
 }
 
 interface AccordionTitleProps {
@@ -59,32 +62,43 @@ interface InsidebarProps {
 
 export function Insidebar({ functions, tables }: InsidebarProps): JSX.Element {
   const formRef = useRef<FormHandles>(null);
+  const testeRef = document.getElementsByClassName('tables-test');
 
   return (
-    <aside className="bg-gray-300 w-60 p-4 flex flex-col overflow-y-auto">
-      <Form ref={formRef} onSubmit={() => undefined}>
-        <Input name="search" placeholder="search" />
-      </Form>
+    <ResizableBox
+      resizeHandles={['e']}
+      axis="x"
+      width={testeRef[0]?.scrollWidth + 42 || 240}
+      height={Infinity}
+      minConstraints={[240, Infinity]}
+      maxConstraints={[556, Infinity]}
+      className="bg-gray-300 p-4 flex flex-col overflow-y-auto"
+    >
+      <div className="flex flex-col overflow-y-auto">
+        <Form ref={formRef} onSubmit={() => undefined}>
+          <Input name="search" placeholder="search" />
+        </Form>
 
-      {!!functions.length && (
-        <Accordion>
-          <AccordionTitle>functions</AccordionTitle>
+        {!!functions.length && (
+          <Accordion>
+            <AccordionTitle>functions</AccordionTitle>
 
-          {functions.map((item) => (
-            <AccordionItem key={item}>{item}</AccordionItem>
-          ))}
-        </Accordion>
-      )}
+            {functions.map((item) => (
+              <AccordionItem key={item}>{item}</AccordionItem>
+            ))}
+          </Accordion>
+        )}
 
-      {!!tables.length && (
-        <Accordion>
-          <AccordionTitle>tables</AccordionTitle>
+        {!!tables.length && (
+          <Accordion>
+            <AccordionTitle>tables</AccordionTitle>
 
-          {tables.map((item) => (
-            <AccordionItem key={item}>{item}</AccordionItem>
-          ))}
-        </Accordion>
-      )}
-    </aside>
+            {tables.map((item) => (
+              <AccordionItem key={item}>{item}</AccordionItem>
+            ))}
+          </Accordion>
+        )}
+      </div>
+    </ResizableBox>
   );
 }

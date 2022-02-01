@@ -21,3 +21,31 @@ html, body, #root {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+.react-resizable {
+  position: relative;
+}
+
+.react-resizable-handle {
+  display: flex;
+  justify-content: center;
+  user-select: none;
+  cursor: ew-resize;
+  position: absolute;
+  font-size: 24px;
+}
+
+.react-resizable-handle::before {
+  width: 2px;
+  height: 24px;
+  /* background: rgba(255, 255, 255, 0.1); */
+  background: tomato;
+  content: '';
+}
+
+.react-resizable-handle-e {
+  right: 0;
+  padding-right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
