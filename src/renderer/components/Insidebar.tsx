@@ -11,7 +11,11 @@ interface AccordionProps {
 }
 
 function Accordion({ children }: AccordionProps): JSX.Element {
-  return <div className="mt-4 overflow-y-auto tables-test">{children}</div>;
+  return (
+    <div className="mt-4 overflow-y-auto tables-test flex flex-col flex-1">
+      {children}
+    </div>
+  );
 }
 
 interface AccordionTitleProps {
@@ -47,7 +51,7 @@ function AccordionItem({ children }: AccordionItemProps): JSX.Element {
   return (
     <button
       type="button"
-      className="h-8 flex items-center ml-4"
+      className="h-full max-h-8 flex items-center ml-4 hover:bg-gray-400"
       onClick={() => window.alert('Under construction.')}
     >
       {children}
@@ -93,9 +97,11 @@ export function Insidebar({ functions, tables }: InsidebarProps): JSX.Element {
           <Accordion>
             <AccordionTitle>tables</AccordionTitle>
 
-            {tables.map((item) => (
-              <AccordionItem key={item}>{item}</AccordionItem>
-            ))}
+            <div className="flex-1 flex flex-col overflow-y-auto">
+              {tables.map((item) => (
+                <AccordionItem key={item}>{item}</AccordionItem>
+              ))}
+            </div>
           </Accordion>
         )}
       </div>
