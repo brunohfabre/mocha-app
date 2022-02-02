@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import { toast } from 'react-toastify';
@@ -120,7 +120,7 @@ export function Tables(): JSX.Element {
             </div>
 
             <footer className="bg-orange-200 h-10 px-4 flex items-center gap-4">
-              <span>rows_count</span>
+              <span>{rows.length}</span>
 
               <span>response_time</span>
             </footer>

@@ -12,9 +12,7 @@ interface AccordionProps {
 
 function Accordion({ children }: AccordionProps): JSX.Element {
   return (
-    <div className="mt-4 overflow-y-auto tables-test flex flex-col flex-1">
-      {children}
-    </div>
+    <div className="mt-4 overflow-y-auto flex flex-col flex-1">{children}</div>
   );
 }
 
@@ -75,7 +73,7 @@ export function Insidebar({ functions, tables }: InsidebarProps): JSX.Element {
       width={testeRef[0]?.scrollWidth + 42 || 240}
       height={Infinity}
       minConstraints={[240, Infinity]}
-      maxConstraints={[556, Infinity]}
+      maxConstraints={[440, Infinity]}
       className="bg-gray-300 p-4 flex flex-col overflow-y-auto"
     >
       <div className="flex flex-col overflow-y-auto">
@@ -97,7 +95,7 @@ export function Insidebar({ functions, tables }: InsidebarProps): JSX.Element {
           <Accordion>
             <AccordionTitle>tables</AccordionTitle>
 
-            <div className="flex-1 flex flex-col overflow-y-auto">
+            <div className="flex-1 flex flex-col overflow-y-auto tables-test">
               {tables.map((item) => (
                 <AccordionItem key={item}>{item}</AccordionItem>
               ))}
