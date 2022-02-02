@@ -1,4 +1,4 @@
-import { ReactNode, useRef } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 
@@ -63,40 +63,67 @@ interface InsidebarProps {
 }
 
 export function Insidebar({ functions, tables }: InsidebarProps): JSX.Element {
-  const formRef = useRef<FormHandles>(null);
-  const testeRef = document.getElementsByClassName('tables-test');
+  const searchFormRef = useRef<FormHandles>(null);
+
+  const [filteredFunctions, setFilteredFunctions] = useState<string[]>([]);
+  const [filteredTables, setFilteredTables] = useState<string[]>([]);
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    function handleSearch(): void {
+      setFilteredFunctions(
+        functions.filter((item) =>
+          item.toLowerCase().includes(search.toLowerCase())
+        )
+      );
+
+      setFilteredTables(
+        tables.filter((item) =>
+          item.toLowerCase().includes(search.toLowerCase())
+        )
+      );
+    }
+
+    handleSearch();
+  }, [search, functions, tables]);
 
   return (
     <ResizableBox
       resizeHandles={['e']}
       axis="x"
-      width={testeRef[0]?.scrollWidth + 42 || 240}
+      width={300}
       height={Infinity}
-      minConstraints={[240, Infinity]}
-      maxConstraints={[440, Infinity]}
-      className="bg-gray-300 p-4 flex flex-col overflow-y-auto"
+      minConstraints={[220, Infinity]}
+      maxConstraints={[500, Infinity]}
+      className="bg-gray-300 p-4 flex flex-col overflow-auto"
     >
-      <div className="flex flex-col overflow-y-auto">
-        <Form ref={formRef} onSubmit={() => undefined}>
-          <Input name="search" placeholder="search" />
+      <div className="flex flex-col overflow-y-auto overflow-x-hidden">
+        <Form ref={searchFormRef} onSubmit={() => undefined}>
+          <Input
+            name="search"
+            placeholder="search"
+            className="w-80"
+            onChange={(e) => setSearch(e.target.value)}
+            autoFocus
+          />
         </Form>
 
-        {!!functions.length && (
+        {!!filteredFunctions.length && (
           <Accordion>
-            <AccordionTitle>functions</AccordionTitle>
+            <AccordionTitle>Functions</AccordionTitle>
 
-            {functions.map((item) => (
+            {filteredFunctions.map((item) => (
               <AccordionItem key={item}>{item}</AccordionItem>
             ))}
           </Accordion>
         )}
 
-        {!!tables.length && (
+        {!!filteredTables.length && (
           <Accordion>
-            <AccordionTitle>tables</AccordionTitle>
+            <AccordionTitle>Tables</AccordionTitle>
 
-            <div className="flex-1 flex flex-col overflow-y-auto tables-test">
-              {tables.map((item) => (
+            <div className="flex-1 flex flex-col overflow-auto">
+              {filteredTables.map((item) => (
                 <AccordionItem key={item}>{item}</AccordionItem>
               ))}
             </div>
