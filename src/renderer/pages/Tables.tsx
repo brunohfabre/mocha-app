@@ -50,7 +50,7 @@ export function Tables(): JSX.Element {
           connectionId,
         });
 
-        setTables(response);
+        setTables(response.sort());
       } catch (err: any) {
         console.log(err.message);
       } finally {

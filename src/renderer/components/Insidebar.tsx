@@ -102,7 +102,6 @@ export function Insidebar({ functions, tables }: InsidebarProps): JSX.Element {
           <Input
             name="search"
             placeholder="search"
-            className="w-80"
             onChange={(e) => setSearch(e.target.value)}
             autoFocus
           />
