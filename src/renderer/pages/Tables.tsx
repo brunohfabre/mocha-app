@@ -21,6 +21,7 @@ export function Tables(): JSX.Element {
   const editorRef = useRef<any>(null);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [responseTime, setResponseTime] = useState(0);
   const [functions, setFunctions] = useState<string[]>([]);
   const [tables, setTables] = useState<string[]>([]);
   const [fields, setFields] = useState<FieldType[]>([]);
@@ -32,12 +33,6 @@ export function Tables(): JSX.Element {
         width: 'auto',
         height: 'auto',
       });
-
-      // const { width, height } = editorEl.getBoundingClientRect();
-      // editorRef.current.layout({
-      //   width,
-      //   height,
-      // });
     });
   }, []);
 
@@ -68,6 +63,8 @@ export function Tables(): JSX.Element {
   async function handleRunQuery() {
     if (editorRef.current) {
       try {
+        const initialTime = Date.now();
+
         setIsLoading(true);
 
         const value = editorRef.current
@@ -81,6 +78,10 @@ export function Tables(): JSX.Element {
 
         setFields(response.fields);
         setRows(response.rows);
+
+        const finalTime = Date.now();
+
+        setResponseTime(finalTime - initialTime);
       } catch (err: any) {
         toast.error(err.message.toLowerCase().split('error:')[1].trimStart());
       } finally {
@@ -122,7 +123,7 @@ export function Tables(): JSX.Element {
             <footer className="bg-orange-200 h-10 px-4 flex items-center gap-4">
               <span>{rows.length}</span>
 
-              <span>response_time</span>
+              <span>{responseTime}ms</span>
             </footer>
           </section>
         </div>
