@@ -14,11 +14,11 @@ interface TableProps {
 
 export function Table({ fields, rows }: TableProps): JSX.Element {
   return (
-    <table className="bg-red-300 w-full">
+    <table className="bg-red-200 w-full">
       <thead>
         <tr>
           {fields.map((field) => (
-            <th className="text-left whitespace-nowrap bg-red-400 sticky top-0">
+            <th className="text-left whitespace-nowrap bg-red-300 sticky top-0">
               {field.name}
             </th>
           ))}

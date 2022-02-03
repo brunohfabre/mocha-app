@@ -76,8 +76,6 @@ export function Databases(): JSX.Element {
     try {
       setIsLoading(true);
 
-      console.log(connectionId, database);
-
       await window.electron.invoke('select-database', {
         connectionId,
         database,

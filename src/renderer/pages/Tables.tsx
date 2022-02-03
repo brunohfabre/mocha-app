@@ -2,6 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import { toast } from 'react-toastify';
+import { ResizableBox } from 'react-resizable';
+
+import { EditorState } from '@codemirror/state';
+import { EditorView, keymap, highlightActiveLine } from '@codemirror/view';
+import { defaultKeymap } from '@codemirror/commands';
+import { history, historyKeymap } from '@codemirror/history';
+import { indentOnInput } from '@codemirror/language';
+import { lineNumbers, highlightActiveLineGutter } from '@codemirror/gutter';
+import { defaultHighlightStyle } from '@codemirror/highlight';
+import { sql } from '@codemirror/lang-sql';
 
 import { Button } from 'renderer/components/Button';
 import { Insidebar } from 'renderer/components/Insidebar';
@@ -26,15 +36,69 @@ export function Tables(): JSX.Element {
   const [tables, setTables] = useState<string[]>([]);
   const [fields, setFields] = useState<FieldType[]>([]);
   const [rows, setRows] = useState([]);
+  const [isQuired, setIsQuired] = useState(false);
+  const [finalValue, setFinalValue] = useState<any>();
+
+  const containerRef = useRef(null);
+  const [editorView, setEditorView] = useState<any>();
 
   useEffect(() => {
-    window.addEventListener('resize', () => {
-      editorRef.current.layout({
-        width: 'auto',
-        height: 'auto',
-      });
+    if (!containerRef.current) return;
+
+    const startState = EditorState.create({
+      doc: '',
+      extensions: [
+        keymap.of([...defaultKeymap, ...historyKeymap]),
+        lineNumbers(),
+        highlightActiveLineGutter(),
+        history(),
+        indentOnInput(),
+        defaultHighlightStyle.fallback,
+        highlightActiveLine(),
+        sql(),
+        EditorView.lineWrapping,
+        EditorView.updateListener.of((update) => {
+          if (update.changes) {
+            setFinalValue({
+              text: update.state.doc.text.reduce(
+                (previousValue: string, currentValue: string) => {
+                  if (previousValue) {
+                    return `${previousValue} ${currentValue}`;
+                  }
+
+                  return currentValue;
+                },
+                ''
+              ),
+              selection: update.state.selection.ranges[0],
+            });
+          }
+        }),
+      ],
     });
-  }, []);
+
+    const view = new EditorView({
+      state: startState,
+      parent: containerRef.current,
+    });
+
+    setEditorView(view);
+  }, [containerRef]);
+
+  // function handleResizeEditor(): void {
+  //   editorRef.current.layout({
+  //     width: 'auto',
+  //     height: 'auto',
+  //   });
+  // }
+
+  // useEffect(() => {
+  //   window.addEventListener('resize', handleResizeEditor);
+
+  //   return () => {
+  //     window.removeEventListener('resize', handleResizeEditor);
+  //   };
+  // }, []);
 
   useEffect(() => {
     async function loadTables(): Promise<void> {
@@ -61,32 +125,32 @@ export function Tables(): JSX.Element {
   }
 
   async function handleRunQuery() {
-    if (editorRef.current) {
-      try {
-        const initialTime = Date.now();
+    try {
+      const initialTime = Date.now();
 
-        setIsLoading(true);
+      setIsLoading(true);
 
-        const value = editorRef.current
-          .getModel()
-          .getValueInRange(editorRef.current.getSelection());
+      const value = finalValue.text.slice(
+        finalValue.selection.from,
+        finalValue.selection.to
+      );
 
-        const response = await window.electron.invoke('run-query', {
-          connectionId,
-          query: value,
-        });
+      const response = await window.electron.invoke('run-query', {
+        connectionId,
+        query: value,
+      });
 
-        setFields(response.fields);
-        setRows(response.rows);
+      setFields(response.fields);
+      setRows(response.rows);
 
-        const finalTime = Date.now();
+      const finalTime = Date.now();
 
-        setResponseTime(finalTime - initialTime);
-      } catch (err: any) {
-        toast.error(err.message.toLowerCase().split('error:')[1].trimStart());
-      } finally {
-        setIsLoading(false);
-      }
+      setResponseTime(finalTime - initialTime);
+      setIsQuired(true);
+    } catch (err: any) {
+      toast.error(err.message.toLowerCase().split('error:')[1].trimStart());
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -100,14 +164,15 @@ export function Tables(): JSX.Element {
         <div className="flex-1 flex flex-col overflow-auto">
           <Tabs />
 
-          <section className="flex-1 bg-teal-100 flex flex-col justify-between">
-            <Editor defaultLanguage="sql" onMount={handleEditorDidMount} />
+          <section className="flex-1 bg-teal-100 flex flex-col justify-between overflow-auto">
+            {/* <Editor defaultLanguage="sql" onMount={handleEditorDidMount} /> */}
+            <div ref={containerRef} className="flex-1 overflow-auto" />
 
-            <div className="ml-auto flex items-center gap-8 p-4">
-              <span className="flex items-center gap-2">
-                {/* <Input type="checkbox" id="check" /> */}
+            <div className="flex items-center gap-8 p-4 bg-teal-200 justify-end">
+              {/* <span className="flex items-center gap-2">
+                <Input type="checkbox" id="check" />
                 Limit to 100 rows
-              </span>
+              </span> */}
 
               <Button type="button" onClick={handleRunQuery}>
                 run query
@@ -115,17 +180,29 @@ export function Tables(): JSX.Element {
             </div>
           </section>
 
-          <section className="flex-1 flex flex-col overflow-auto">
-            <div className="bg-orange-100 flex-1 w-full overflow-auto">
-              <Table fields={fields} rows={rows} />
-            </div>
+          <ResizableBox
+            resizeHandles={['n']}
+            axis="y"
+            width={Infinity}
+            height={300}
+            minConstraints={[Infinity, 180]}
+            maxConstraints={[Infinity, 556]}
+            className="bg-gray-300 flex flex-col overflow-auto"
+          >
+            <section className="flex-1 flex flex-col overflow-auto">
+              <div className="bg-orange-100 flex-1 w-full overflow-auto">
+                <Table fields={fields} rows={rows} />
+              </div>
 
-            <footer className="bg-orange-200 h-10 px-4 flex items-center gap-4">
-              <span>{rows.length}</span>
+              {isQuired && (
+                <footer className="bg-orange-200 h-10 px-4 flex items-center gap-4">
+                  <span>{rows.length} rows</span>
 
-              <span>{responseTime}ms</span>
-            </footer>
-          </section>
+                  <span>{responseTime} ms</span>
+                </footer>
+              )}
+            </section>
+          </ResizableBox>
         </div>
       </div>
     </>

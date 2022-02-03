@@ -26,7 +26,7 @@ html, body, #root {
   position: relative;
 }
 
-.react-resizable-handle {
+.react-resizable-handle.react-resizable-handle-e {
   display: flex;
   justify-content: center;
   user-select: none;
@@ -35,7 +35,7 @@ html, body, #root {
   font-size: 24px;
 }
 
-.react-resizable-handle::before {
+.react-resizable-handle.react-resizable-handle-e::before {
   width: 2px;
   height: 100%;
   /* background: rgba(255, 255, 255, 0.1); */
@@ -47,4 +47,35 @@ html, body, #root {
   right: 0;
   top: 0;
   bottom : 0;
+}
+
+.react-resizable-handle.react-resizable-handle-n {
+  display: flex;
+  align-items: center;
+  user-select: none;
+  cursor: ns-resize;
+  position: absolute;
+  font-size: 24px;
+}
+
+.react-resizable-handle.react-resizable-handle-n::before {
+  width: 100%;
+  height: 2px;
+  /* background: rgba(255, 255, 255, 0.1); */
+  background: red;
+  content: '';
+}
+
+.react-resizable-handle-n {
+  left: 0;
+  right: 0;
+  top: 0;
+}
+
+.cm-editor {
+  height: 100%;
+}
+
+.cm-gutter {
+  width: 48px;
 }
