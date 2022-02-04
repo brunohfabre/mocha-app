@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { omit } from 'lodash';
 
@@ -14,6 +14,37 @@ interface TableProps {
   rows: RowType[];
 }
 
+interface RowProps {
+  defaultValue: string;
+}
+
+function Row({ defaultValue }: RowProps): JSX.Element {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const [value, setValue] = useState(defaultValue);
+
+  const [initialWidth, setInitialWidth] = useState(0);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      if (!initialWidth) {
+        setInitialWidth(inputRef.current.scrollWidth);
+      }
+    }
+  }, [inputRef]);
+
+  return (
+    <input
+      ref={inputRef}
+      type="text"
+      className="flex-1 whitespace-nowrap bg-red-200"
+      style={{ minWidth: initialWidth, width: '100%' }}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+    />
+  );
+}
+
 export function Table({ fields, rows }: TableProps): JSX.Element {
   const [items, setItems] = useState<{ [key: string]: string }>({});
 
@@ -24,7 +55,25 @@ export function Table({ fields, rows }: TableProps): JSX.Element {
 
   return (
     <>
-      <table className="bg-red-200 w-full">
+      <div
+        className="w-full grid"
+        style={{
+          gridTemplateColumns: `repeat(${fields.length}, 1fr)`,
+        }}
+      >
+        {fields.map((field) => (
+          <div className="bg-red-300">{field.name}</div>
+        ))}
+
+        {rows.map((row) => (
+          <>
+            {fields.map((field) => (
+              <Row defaultValue={row[field.name]} />
+            ))}
+          </>
+        ))}
+      </div>
+      {/* <table className="bg-red-200 w-full">
         <thead>
           <tr>
             {fields.map((field) => (
@@ -45,28 +94,8 @@ export function Table({ fields, rows }: TableProps): JSX.Element {
                     items[row.rowId][field.name] &&
                     'bg-orange-400'
                   }`}
-                  contentEditable
-                  onBlur={(e) => {
-                    if (e.target?.textContent) {
-                      if (e.target.textContent !== row[field.name]) {
-                        setItems((prevState) => ({
-                          ...prevState,
-                          [row.rowId]: {
-                            ...items[row.rowId],
-                            [field.name]: e.target.textContent,
-                          },
-                        }));
-                      } else {
-                        const newItem = omit(items[row.rowId], [field.name]);
-
-                        setItems((prevState) => ({
-                          ...prevState,
-                          [row.rowId]: newItem,
-                        }));
-                      }
-                    }
-                  }}
                 >
+
                   {field.type === 'text'
                     ? row[field.name]
                     : field.type === 'timestamp'
@@ -77,7 +106,7 @@ export function Table({ fields, rows }: TableProps): JSX.Element {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table> */}
 
       <button type="button" onClick={handleUpdate}>
         save

@@ -17,7 +17,7 @@ import { Button } from 'renderer/components/Button';
 import { Insidebar } from 'renderer/components/Insidebar';
 import { Tabs } from 'renderer/components/Tabs';
 import { Spin } from 'renderer/components/Spin';
-import { TableInput } from 'renderer/components/TableInput';
+import { Table } from 'renderer/components/Table';
 
 type FieldType = {
   name: string;
@@ -42,8 +42,6 @@ export function Tables(): JSX.Element {
 
   const containerRef = useRef(null);
   const [editorView, setEditorView] = useState<any>();
-
-  console.log(inputRef?.current?.scrollWidth);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -199,34 +197,7 @@ export function Tables(): JSX.Element {
           >
             <section className="flex-1 flex flex-col overflow-auto">
               <div className="bg-orange-100 flex-1 w-full overflow-auto">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  defaultValue="Lorem Ipsum is simply dummy text of the printing and typesetting industry."
-                />
-                <div
-                  className="grid"
-                  style={{
-                    gridTemplateColumns: `repeat(${fields.length}, 1fr)`,
-                  }}
-                >
-                  {fields.map((field) => (
-                    <div>{field.name}</div>
-                  ))}
-
-                  {rows.map((row) => (
-                    <>
-                      {fields.map((field) => (
-                        <input
-                          type="text"
-                          className="whitespace-nowrap"
-                          value={String(row[field.name])}
-                        />
-                      ))}
-                    </>
-                  ))}
-                </div>
-                {/* <TableInput fields={fields} rows={rows} /> */}
+                <Table fields={fields} rows={rows} />
               </div>
 
               {isQuired && (
