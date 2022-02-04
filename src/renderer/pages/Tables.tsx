@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Editor from '@monaco-editor/react';
 import { toast } from 'react-toastify';
 import { ResizableBox } from 'react-resizable';
+import { v4 as uuid } from 'uuid';
 
 import { EditorState } from '@codemirror/state';
 import { EditorView, keymap, highlightActiveLine } from '@codemirror/view';
@@ -17,7 +17,7 @@ import { Button } from 'renderer/components/Button';
 import { Insidebar } from 'renderer/components/Insidebar';
 import { Tabs } from 'renderer/components/Tabs';
 import { Spin } from 'renderer/components/Spin';
-import { Table } from 'renderer/components/Table';
+import { TableInput } from 'renderer/components/TableInput';
 
 type FieldType = {
   name: string;
@@ -29,6 +29,7 @@ export function Tables(): JSX.Element {
     useParams<{ connection_id: string }>();
 
   const editorRef = useRef<any>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [responseTime, setResponseTime] = useState(0);
@@ -41,6 +42,8 @@ export function Tables(): JSX.Element {
 
   const containerRef = useRef(null);
   const [editorView, setEditorView] = useState<any>();
+
+  console.log(inputRef?.current?.scrollWidth);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -141,7 +144,12 @@ export function Tables(): JSX.Element {
       });
 
       setFields(response.fields);
-      setRows(response.rows);
+      setRows(
+        response.rows.map((row: { [key: string]: string }) => ({
+          ...row,
+          rowId: uuid(),
+        }))
+      );
 
       const finalTime = Date.now();
 
@@ -191,7 +199,34 @@ export function Tables(): JSX.Element {
           >
             <section className="flex-1 flex flex-col overflow-auto">
               <div className="bg-orange-100 flex-1 w-full overflow-auto">
-                <Table fields={fields} rows={rows} />
+                <input
+                  ref={inputRef}
+                  type="text"
+                  defaultValue="Lorem Ipsum is simply dummy text of the printing and typesetting industry."
+                />
+                <div
+                  className="grid"
+                  style={{
+                    gridTemplateColumns: `repeat(${fields.length}, 1fr)`,
+                  }}
+                >
+                  {fields.map((field) => (
+                    <div>{field.name}</div>
+                  ))}
+
+                  {rows.map((row) => (
+                    <>
+                      {fields.map((field) => (
+                        <input
+                          type="text"
+                          className="whitespace-nowrap"
+                          value={String(row[field.name])}
+                        />
+                      ))}
+                    </>
+                  ))}
+                </div>
+                {/* <TableInput fields={fields} rows={rows} /> */}
               </div>
 
               {isQuired && (

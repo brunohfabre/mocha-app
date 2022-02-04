@@ -172,6 +172,7 @@
     "@types/react-resizable": "^1.7.4",
     "@types/react-test-renderer": "^17.0.1",
     "@types/terser-webpack-plugin": "^5.0.4",
+    "@types/uuid": "^8.3.4",
     "@types/webpack-env": "^1.16.3",
     "@typescript-eslint/eslint-plugin": "^5.8.1",
     "@typescript-eslint/parser": "^5.8.1",
@@ -258,6 +259,7 @@
     "react-router-dom": "^6.2.1",
     "react-toastify": "^8.1.0",
     "regenerator-runtime": "^0.13.9",
+    "uuid": "^8.3.2",
     "yup": "^0.32.11"
   },
   "devEngines": {
