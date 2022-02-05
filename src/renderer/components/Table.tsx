@@ -16,9 +16,11 @@ interface TableProps {
 
 interface RowProps {
   defaultValue: string;
+  isUpdated: boolean;
+  setToUpdate: (value: string) => void;
 }
 
-function Row({ defaultValue }: RowProps): JSX.Element {
+function Row({ defaultValue, isUpdated, setToUpdate }: RowProps): JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [value, setValue] = useState(defaultValue);
@@ -33,14 +35,23 @@ function Row({ defaultValue }: RowProps): JSX.Element {
     }
   }, [inputRef]);
 
+  function handleBlur(): void {
+    if (inputRef.current) {
+      setToUpdate(inputRef.current.value);
+    }
+  }
+
   return (
     <input
       ref={inputRef}
       type="text"
-      className="flex-1 whitespace-nowrap bg-red-200"
+      className={`flex-1 whitespace-nowrap ${
+        isUpdated ? 'bg-orange-400' : 'bg-red-200'
+      }`}
       style={{ minWidth: initialWidth, width: '100%' }}
       value={value}
       onChange={(e) => setValue(e.target.value)}
+      onBlur={handleBlur}
     />
   );
 }
@@ -68,7 +79,26 @@ export function Table({ fields, rows }: TableProps): JSX.Element {
         {rows.map((row) => (
           <>
             {fields.map((field) => (
-              <Row defaultValue={row[field.name]} />
+              <Row
+                defaultValue={row[field.name]}
+                isUpdated={items[row.rowId] && items[row.rowId][field.name]}
+                setToUpdate={(value) => {
+                  if (row[field.name] === value) {
+                    setItems((prevState) => ({
+                      ...prevState,
+                      [row.rowId]: omit(prevState[row.rowId], [field.name]),
+                    }));
+                  } else {
+                    setItems((prevState) => ({
+                      ...prevState,
+                      [row.rowId]: {
+                        ...prevState[row.rowId],
+                        [field.name]: value,
+                      },
+                    }));
+                  }
+                }}
+              />
             ))}
           </>
         ))}
