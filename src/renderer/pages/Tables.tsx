@@ -29,7 +29,6 @@ export function Tables(): JSX.Element {
     useParams<{ connection_id: string }>();
 
   const editorRef = useRef<any>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [responseTime, setResponseTime] = useState(0);
@@ -39,6 +38,7 @@ export function Tables(): JSX.Element {
   const [rows, setRows] = useState([]);
   const [isQuired, setIsQuired] = useState(false);
   const [finalValue, setFinalValue] = useState<any>();
+  const [lastQuery, setLastQuery] = useState('');
 
   const containerRef = useRef(null);
   const [editorView, setEditorView] = useState<any>();
@@ -86,21 +86,6 @@ export function Tables(): JSX.Element {
     setEditorView(view);
   }, [containerRef]);
 
-  // function handleResizeEditor(): void {
-  //   editorRef.current.layout({
-  //     width: 'auto',
-  //     height: 'auto',
-  //   });
-  // }
-
-  // useEffect(() => {
-  //   window.addEventListener('resize', handleResizeEditor);
-
-  //   return () => {
-  //     window.removeEventListener('resize', handleResizeEditor);
-  //   };
-  // }, []);
-
   useEffect(() => {
     async function loadTables(): Promise<void> {
       try {
@@ -120,10 +105,6 @@ export function Tables(): JSX.Element {
 
     loadTables();
   }, [connectionId]);
-
-  function handleEditorDidMount(editor: any, monaco: any) {
-    editorRef.current = editor;
-  }
 
   async function handleRunQuery() {
     try {
@@ -151,6 +132,7 @@ export function Tables(): JSX.Element {
 
       const finalTime = Date.now();
 
+      setLastQuery(value);
       setResponseTime(finalTime - initialTime);
       setIsQuired(true);
     } catch (err: any) {
@@ -171,7 +153,6 @@ export function Tables(): JSX.Element {
           <Tabs />
 
           <section className="flex-1 bg-teal-100 flex flex-col justify-between overflow-auto">
-            {/* <Editor defaultLanguage="sql" onMount={handleEditorDidMount} /> */}
             <div ref={containerRef} className="flex-1 overflow-auto" />
 
             <div className="flex items-center gap-8 p-4 bg-teal-200 justify-end">
@@ -197,7 +178,7 @@ export function Tables(): JSX.Element {
           >
             <section className="flex-1 flex flex-col overflow-auto">
               <div className="bg-orange-100 flex-1 w-full overflow-auto">
-                <Table fields={fields} rows={rows} />
+                <Table fields={fields} rows={rows} lastQuery={lastQuery} />
               </div>
 
               {isQuired && (

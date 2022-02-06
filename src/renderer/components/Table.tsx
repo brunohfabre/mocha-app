@@ -12,6 +12,7 @@ type RowType = { [key: string]: string };
 interface TableProps {
   fields: FieldType[];
   rows: RowType[];
+  lastQuery?: string;
 }
 
 interface RowProps {
@@ -56,12 +57,41 @@ function Row({ defaultValue, isUpdated, setToUpdate }: RowProps): JSX.Element {
   );
 }
 
-export function Table({ fields, rows }: TableProps): JSX.Element {
+export function Table({ fields, rows, lastQuery }: TableProps): JSX.Element {
   const [items, setItems] = useState<{ [key: string]: string }>({});
 
   function handleUpdate(): void {
-    console.log(rows);
-    console.log(items);
+    try {
+      console.log('LAST QUERY: ', lastQuery);
+
+      if (!lastQuery) {
+        throw new Error('nao tem lastquery');
+      }
+
+      if (lastQuery.split(' ')[0] !== 'select') {
+        throw new Error('nao e select');
+      }
+
+      if (lastQuery.includes('join')) {
+        throw new Error('nao pode ter join');
+      }
+
+      const filteredItems = Object.keys(items).filter(
+        (key: string) => !!Object.keys(items[key]).length
+      );
+
+      const splittedQuery = lastQuery.replaceAll(';', '').split(' ');
+
+      const fromIndex = splittedQuery.findIndex(
+        (item: string) => item === 'from'
+      );
+
+      const tableName = splittedQuery[fromIndex + 1];
+
+      console.log(filteredItems, tableName);
+    } catch (err: any) {
+      console.log(err.message);
+    }
   }
 
   return (
