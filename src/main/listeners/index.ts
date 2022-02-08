@@ -5,6 +5,7 @@ import { showDatabases } from './showDatabases';
 import { selectDatabase } from './selectDatabase';
 import { showTables } from './showTables';
 import { runQuery } from './runQuery';
+import { updateField } from './updateField';
 
 export function registerListeners(): void {
   testConnection();
@@ -14,4 +15,5 @@ export function registerListeners(): void {
   selectDatabase();
   showTables();
   runQuery();
+  updateField();
 }

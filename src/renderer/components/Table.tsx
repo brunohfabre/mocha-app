@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { format } from 'date-fns';
+import { useEffect, useRef, useState } from 'react';
 import { omit } from 'lodash';
+import { useParams } from 'react-router-dom';
+
+import { Spin } from 'renderer/components/Spin';
 
 type FieldType = {
   name: string;
@@ -58,12 +60,14 @@ function Row({ defaultValue, isUpdated, setToUpdate }: RowProps): JSX.Element {
 }
 
 export function Table({ fields, rows, lastQuery }: TableProps): JSX.Element {
+  const { connection_id: connectionId } =
+    useParams<{ connection_id: string }>();
+
+  const [isLoading, setIsLoading] = useState(false);
   const [items, setItems] = useState<{ [key: string]: string }>({});
 
-  function handleUpdate(): void {
+  async function handleUpdate(): Promise<void> {
     try {
-      console.log('LAST QUERY: ', lastQuery);
-
       if (!lastQuery) {
         throw new Error('nao tem lastquery');
       }
@@ -75,6 +79,8 @@ export function Table({ fields, rows, lastQuery }: TableProps): JSX.Element {
       if (lastQuery.includes('join')) {
         throw new Error('nao pode ter join');
       }
+
+      setIsLoading(true);
 
       const filteredItems = Object.keys(items).filter(
         (key: string) => !!Object.keys(items[key]).length
@@ -88,14 +94,26 @@ export function Table({ fields, rows, lastQuery }: TableProps): JSX.Element {
 
       const tableName = splittedQuery[fromIndex + 1];
 
-      console.log(filteredItems, tableName);
+      const result = filteredItems.map((item: string) => ({
+        changed: items[item],
+        initial: rows.find((row) => row.rowId === item),
+      }));
+
+      await window.electron.invoke('update-field', {
+        connectionId,
+        table: tableName,
+        rows: result,
+      });
     } catch (err: any) {
       console.log(err.message);
+    } finally {
+      setIsLoading(false);
     }
   }
 
   return (
     <>
+      <Spin spinning={isLoading} />
       <div
         className="w-full grid"
         style={{
