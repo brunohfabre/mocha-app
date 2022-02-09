@@ -104,6 +104,8 @@ export function Table({ fields, rows, lastQuery }: TableProps): JSX.Element {
         table: tableName,
         rows: result,
       });
+
+      setItems({});
     } catch (err: any) {
       console.log(err.message);
     } finally {

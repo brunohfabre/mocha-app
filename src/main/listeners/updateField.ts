@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron';
+import knex from 'knex';
 
 import { connections } from '../connections';
 
@@ -78,9 +79,15 @@ export function updateField(): void {
         console.log(response);
       }
 
-      const result = await connection.connection.raw(queries[0]);
+      connection.connection.transaction((trx) => {
+        return Promise.all(
+          queries.map((query) =>
+            connection.connection.raw(query).transacting(trx)
+          )
+        );
+      });
 
-      console.log(result);
+      // const result = await connection.connection.raw(queries[0]);
 
       return true;
     }
