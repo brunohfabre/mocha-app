@@ -15,6 +15,7 @@ type RowType = { [key: string]: string };
 interface TableProps {
   fields: FieldType[];
   rows: RowType[];
+  updateRows: (items: { [key: string]: string }) => void;
   lastQuery?: string;
 }
 
@@ -60,7 +61,12 @@ function Row({ defaultValue, isUpdated, setToUpdate }: RowProps): JSX.Element {
   );
 }
 
-export function Table({ fields, rows, lastQuery }: TableProps): JSX.Element {
+export function Table({
+  fields,
+  rows,
+  updateRows,
+  lastQuery,
+}: TableProps): JSX.Element {
   const { connection_id: connectionId } =
     useParams<{ connection_id: string }>();
 
@@ -112,6 +118,8 @@ export function Table({ fields, rows, lastQuery }: TableProps): JSX.Element {
         table: tableName,
         rows: result,
       });
+
+      updateRows(items);
 
       setItems({});
     } catch (err: any) {

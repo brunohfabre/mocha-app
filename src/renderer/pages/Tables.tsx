@@ -33,7 +33,7 @@ export function Tables(): JSX.Element {
   const [functions, setFunctions] = useState<string[]>([]);
   const [tables, setTables] = useState<string[]>([]);
   const [fields, setFields] = useState<FieldType[]>([]);
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState<{ [key: string]: string }[]>([]);
   const [isQuired, setIsQuired] = useState(false);
   const [finalValue, setFinalValue] = useState<any>();
   const [lastQuery, setLastQuery] = useState('');
@@ -140,6 +140,20 @@ export function Tables(): JSX.Element {
     }
   }
 
+  function handleUpdateRows(items: { [key: string]: string }) {
+    Object.keys(items).forEach((item) => {
+      // const findRow = rows.find((row) => row.rowId === item);
+
+      setRows((prevState) =>
+        prevState.map((row) =>
+          row.rowId === item ? { ...row, ...items[item] } : row
+        )
+      );
+
+      // console.log(findRow);
+    });
+  }
+
   return (
     <>
       <Spin spinning={isLoading} />
@@ -176,7 +190,12 @@ export function Tables(): JSX.Element {
           >
             <section className="flex-1 flex flex-col overflow-auto">
               <div className="bg-orange-100 flex-1 w-full overflow-auto">
-                <Table fields={fields} rows={rows} lastQuery={lastQuery} />
+                <Table
+                  fields={fields}
+                  rows={rows}
+                  updateRows={handleUpdateRows}
+                  lastQuery={lastQuery}
+                />
               </div>
 
               {isQuired && (
