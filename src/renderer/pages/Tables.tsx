@@ -28,8 +28,6 @@ export function Tables(): JSX.Element {
   const { connection_id: connectionId } =
     useParams<{ connection_id: string }>();
 
-  const editorRef = useRef<any>(null);
-
   const [isLoading, setIsLoading] = useState(false);
   const [responseTime, setResponseTime] = useState(0);
   const [functions, setFunctions] = useState<string[]>([]);

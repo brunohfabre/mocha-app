@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { omit } from 'lodash';
 import { useParams } from 'react-router-dom';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import { Spin } from 'renderer/components/Spin';
 
@@ -66,8 +67,15 @@ export function Table({ fields, rows, lastQuery }: TableProps): JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
   const [items, setItems] = useState<{ [key: string]: string }>({});
 
+  const commandOrCtrl = () =>
+    window.navigator.platform.match(/^Mac/) ? 'command' : 'ctrl';
+
   async function handleUpdate(): Promise<void> {
     try {
+      if (!Object.keys(items).length) {
+        throw new Error('nao tem items');
+      }
+
       if (!lastQuery) {
         throw new Error('nao tem lastquery');
       }
@@ -113,6 +121,15 @@ export function Table({ fields, rows, lastQuery }: TableProps): JSX.Element {
     }
   }
 
+  useHotkeys(
+    `${commandOrCtrl()}+s`,
+    () => {
+      console.log(items);
+      handleUpdate();
+    },
+    [items]
+  );
+
   return (
     <>
       <Spin spinning={isLoading} />
@@ -134,10 +151,18 @@ export function Table({ fields, rows, lastQuery }: TableProps): JSX.Element {
                 isUpdated={items[row.rowId] && items[row.rowId][field.name]}
                 setToUpdate={(value) => {
                   if (row[field.name] === value) {
-                    setItems((prevState) => ({
-                      ...prevState,
-                      [row.rowId]: omit(prevState[row.rowId], [field.name]),
-                    }));
+                    setItems((prevState) => {
+                      const newState = omit(prevState[row.rowId], [field.name]);
+
+                      if (!Object.keys(newState).length) {
+                        return omit(prevState, [row.rowId]);
+                      }
+
+                      return {
+                        ...prevState,
+                        [row.rowId]: newState,
+                      };
+                    });
                   } else {
                     setItems((prevState) => ({
                       ...prevState,
@@ -188,9 +213,11 @@ export function Table({ fields, rows, lastQuery }: TableProps): JSX.Element {
         </tbody>
       </table> */}
 
-      <button type="button" onClick={handleUpdate}>
-        save
-      </button>
+      {/* {!!Object.keys(items).length && (
+        <button type="button" onClick={handleUpdate}>
+          save
+        </button>
+      )} */}
     </>
   );
 }
