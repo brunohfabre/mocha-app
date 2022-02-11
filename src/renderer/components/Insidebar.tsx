@@ -42,17 +42,18 @@ function AccordionTitle({ children }: AccordionTitleProps): JSX.Element {
 }
 
 interface AccordionItemProps {
-  children: ReactNode;
+  name: string;
+  onClick: (value: string) => void;
 }
 
-function AccordionItem({ children }: AccordionItemProps): JSX.Element {
+function AccordionItem({ name, onClick }: AccordionItemProps): JSX.Element {
   return (
     <button
       type="button"
       className="h-full max-h-8 flex items-center ml-4 hover:bg-gray-400"
-      onClick={() => window.alert('Under construction.')}
+      onClick={() => onClick(name)}
     >
-      {children}
+      {name}
     </button>
   );
 }
@@ -60,9 +61,14 @@ function AccordionItem({ children }: AccordionItemProps): JSX.Element {
 interface InsidebarProps {
   functions: string[];
   tables: string[];
+  onClick: (value: string) => void;
 }
 
-export function Insidebar({ functions, tables }: InsidebarProps): JSX.Element {
+export function Insidebar({
+  functions,
+  tables,
+  onClick,
+}: InsidebarProps): JSX.Element {
   const searchFormRef = useRef<FormHandles>(null);
 
   const [filteredFunctions, setFilteredFunctions] = useState<string[]>([]);
@@ -107,7 +113,7 @@ export function Insidebar({ functions, tables }: InsidebarProps): JSX.Element {
           />
         </Form>
 
-        {!!filteredFunctions.length && (
+        {/* {!!filteredFunctions.length && (
           <Accordion>
             <AccordionTitle>Functions</AccordionTitle>
 
@@ -115,7 +121,7 @@ export function Insidebar({ functions, tables }: InsidebarProps): JSX.Element {
               <AccordionItem key={item}>{item}</AccordionItem>
             ))}
           </Accordion>
-        )}
+        )} */}
 
         {!!filteredTables.length && (
           <Accordion>
@@ -123,7 +129,7 @@ export function Insidebar({ functions, tables }: InsidebarProps): JSX.Element {
 
             <div className="flex-1 flex flex-col overflow-auto">
               {filteredTables.map((item) => (
-                <AccordionItem key={item}>{item}</AccordionItem>
+                <AccordionItem key={item} name={item} onClick={onClick} />
               ))}
             </div>
           </Accordion>

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { ResizableBox } from 'react-resizable';
+import { toast } from 'react-toastify';
 import { v4 as uuid } from 'uuid';
 
 import { EditorState } from '@codemirror/state';
@@ -14,32 +13,28 @@ import { defaultHighlightStyle } from '@codemirror/highlight';
 import { sql } from '@codemirror/lang-sql';
 
 import { Button } from 'renderer/components/Button';
-import { Insidebar } from 'renderer/components/Insidebar';
-import { Tabs } from 'renderer/components/Tabs';
-import { Spin } from 'renderer/components/Spin';
 import { Table } from 'renderer/components/Table';
+import { Spin } from 'renderer/components/Spin';
+import { useParams } from 'react-router-dom';
 
 type FieldType = {
   name: string;
   type: string;
 };
 
-export function Tables(): JSX.Element {
+export function Sql(): JSX.Element {
   const { connection_id: connectionId } =
     useParams<{ connection_id: string }>();
 
+  const containerRef = useRef(null);
+
   const [isLoading, setIsLoading] = useState(false);
-  const [responseTime, setResponseTime] = useState(0);
-  const [functions, setFunctions] = useState<string[]>([]);
-  const [tables, setTables] = useState<string[]>([]);
-  const [fields, setFields] = useState<FieldType[]>([]);
-  const [rows, setRows] = useState<{ [key: string]: string }[]>([]);
+  const [lastQuery, setLastQuery] = useState('');
   const [isQuired, setIsQuired] = useState(false);
   const [finalValue, setFinalValue] = useState<any>();
-  const [lastQuery, setLastQuery] = useState('');
-
-  const containerRef = useRef(null);
-  const [editorView, setEditorView] = useState<any>();
+  const [fields, setFields] = useState<FieldType[]>([]);
+  const [rows, setRows] = useState<{ [key: string]: string }[]>([]);
+  const [responseTime, setResponseTime] = useState(0);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -58,8 +53,10 @@ export function Tables(): JSX.Element {
         EditorView.lineWrapping,
         EditorView.updateListener.of((update) => {
           if (update.changes) {
+            const { text } = update.state.doc as any;
+
             setFinalValue({
-              text: update.state.doc.text.reduce(
+              text: text.reduce(
                 (previousValue: string, currentValue: string) => {
                   if (previousValue) {
                     return `${previousValue} ${currentValue}`;
@@ -76,33 +73,11 @@ export function Tables(): JSX.Element {
       ],
     });
 
-    const view = new EditorView({
+    const _ = new EditorView({
       state: startState,
       parent: containerRef.current,
     });
-
-    setEditorView(view);
   }, [containerRef]);
-
-  useEffect(() => {
-    async function loadTables(): Promise<void> {
-      try {
-        setIsLoading(true);
-
-        const response = await window.electron.invoke('show-tables', {
-          connectionId,
-        });
-
-        setTables(response.sort());
-      } catch (err: any) {
-        console.log(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    loadTables();
-  }, [connectionId]);
 
   async function handleRunQuery() {
     try {
@@ -146,7 +121,7 @@ export function Tables(): JSX.Element {
 
       setRows((prevState) =>
         prevState.map((row) =>
-          row.rowId === item ? { ...row, ...items[item] } : row
+          row.rowId === item ? Object.assign(row, items) : row
         )
       );
 
@@ -158,57 +133,49 @@ export function Tables(): JSX.Element {
     <>
       <Spin spinning={isLoading} />
 
-      <div className="flex-1 flex overflow-auto">
-        <Insidebar functions={functions} tables={tables} />
+      <section className="flex-1 bg-teal-100 flex flex-col justify-between overflow-auto">
+        <div ref={containerRef} className="flex-1 overflow-auto" />
 
-        <div className="flex-1 flex flex-col overflow-auto">
-          <Tabs />
+        <div className="flex items-center gap-8 p-4 bg-teal-200 justify-end">
+          {/* <span className="flex items-center gap-2">
+            <Input type="checkbox" id="check" />
+            Limit to 100 rows
+          </span> */}
 
-          <section className="flex-1 bg-teal-100 flex flex-col justify-between overflow-auto">
-            <div ref={containerRef} className="flex-1 overflow-auto" />
-
-            <div className="flex items-center gap-8 p-4 bg-teal-200 justify-end">
-              {/* <span className="flex items-center gap-2">
-                <Input type="checkbox" id="check" />
-                Limit to 100 rows
-              </span> */}
-
-              <Button type="button" onClick={handleRunQuery}>
-                run query
-              </Button>
-            </div>
-          </section>
-
-          <ResizableBox
-            resizeHandles={['n']}
-            axis="y"
-            width={Infinity}
-            height={300}
-            minConstraints={[Infinity, 180]}
-            maxConstraints={[Infinity, 556]}
-            className="bg-gray-300 flex flex-col overflow-auto"
-          >
-            <section className="flex-1 flex flex-col overflow-auto">
-              <div className="bg-orange-100 flex-1 w-full overflow-auto">
-                <Table
-                  fields={fields}
-                  rows={rows}
-                  updateRows={handleUpdateRows}
-                  lastQuery={lastQuery}
-                />
-              </div>
-
-              {isQuired && (
-                <footer className="bg-orange-200 h-10 px-4 flex items-center gap-4">
-                  <span>{rows.length} rows</span>
-
-                  <span>{responseTime} ms</span>
-                </footer>
-              )}
-            </section>
-          </ResizableBox>
+          <Button type="button" onClick={handleRunQuery}>
+            run query
+          </Button>
         </div>
-      </div>
+      </section>
+
+      <ResizableBox
+        resizeHandles={['n']}
+        axis="y"
+        width={Infinity}
+        height={300}
+        minConstraints={[Infinity, 180]}
+        maxConstraints={[Infinity, 556]}
+        className="bg-gray-300 flex flex-col overflow-auto"
+      >
+        <section className="flex-1 flex flex-col overflow-auto">
+          <div className="bg-orange-100 flex-1 w-full overflow-auto">
+            <Table
+              fields={fields}
+              rows={rows}
+              updateRows={handleUpdateRows}
+              lastQuery={lastQuery}
+            />
+          </div>
+
+          {isQuired && (
+            <footer className="bg-orange-200 h-10 px-4 flex items-center gap-4">
+              <span>{rows.length} rows</span>
+
+              <span>{responseTime} ms</span>
+            </footer>
+          )}
+        </section>
+      </ResizableBox>
     </>
   );
 }
