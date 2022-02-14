@@ -29,6 +29,8 @@ export function TableView({ table }: TableViewProps): JSX.Element {
   useEffect(() => {
     async function handleRunQuery() {
       try {
+        console.log('handle run query');
+
         const initialTime = Date.now();
 
         setIsLoading(true);
@@ -60,10 +62,10 @@ export function TableView({ table }: TableViewProps): JSX.Element {
       }
     }
 
-    if (connectionId && table) {
+    if (connectionId && table && !lastQuery) {
       handleRunQuery();
     }
-  }, [connectionId, table]);
+  }, [connectionId, table, lastQuery]);
 
   function handleUpdateRows(items: { [key: string]: string }) {
     Object.keys(items).forEach((item) => {

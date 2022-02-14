@@ -24,6 +24,7 @@ export function Tables(): JSX.Element {
 
   const [tabSelected, setTabSelected] = useState(0);
   const [tabs, setTabs] = useState<string[]>(['sql']);
+  const [panels, setPanels] = useState([() => <Sql />]);
 
   useEffect(() => {
     async function loadTables(): Promise<void> {
@@ -45,6 +46,11 @@ export function Tables(): JSX.Element {
     loadTables();
   }, [connectionId]);
 
+  function handleDeleteTab(value: number): void {
+    setTabs((prevState) => prevState.filter((_, index) => index !== value));
+    setPanels((prevState) => prevState.filter((_, index) => index !== value));
+  }
+
   return (
     <>
       <Spin spinning={isLoading} />
@@ -56,6 +62,10 @@ export function Tables(): JSX.Element {
           onClick={(tab) => {
             setTabSelected(tabs.length);
             setTabs((prevState) => [...prevState, tab]);
+            setPanels((prevState) => [
+              ...prevState,
+              () => <TableView table={tab} />,
+            ]);
           }}
         />
 
@@ -66,10 +76,7 @@ export function Tables(): JSX.Element {
                 key={tab}
                 onDelete={
                   tab !== 'sql'
-                    ? (value) =>
-                        setTabs((prevState) =>
-                          prevState.filter((_, index) => index !== value)
-                        )
+                    ? (value: number) => handleDeleteTab(value)
                     : undefined
                 }
               >
@@ -79,9 +86,9 @@ export function Tables(): JSX.Element {
           </TabList>
 
           <TabPanels>
-            {tabs.map((tab) => (
+            {panels.map((Panel) => (
               <TabPanel>
-                {tab === 'sql' ? <Sql /> : <TableView table={tab} />}
+                <Panel />
               </TabPanel>
             ))}
           </TabPanels>
