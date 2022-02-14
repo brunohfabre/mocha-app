@@ -47,8 +47,14 @@ export function Tables(): JSX.Element {
   }, [connectionId]);
 
   function handleDeleteTab(value: number): void {
+    const tabsLength = tabs.length;
+
     setTabs((prevState) => prevState.filter((_, index) => index !== value));
     setPanels((prevState) => prevState.filter((_, index) => index !== value));
+
+    if (tabsLength <= 2) {
+      setTabSelected(0);
+    }
   }
 
   return (
@@ -87,7 +93,7 @@ export function Tables(): JSX.Element {
 
           <TabPanels>
             {panels.map((Panel) => (
-              <TabPanel>
+              <TabPanel key={JSON.stringify(Panel)}>
                 <Panel />
               </TabPanel>
             ))}

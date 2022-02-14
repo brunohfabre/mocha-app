@@ -120,6 +120,7 @@ export function Insidebar({
             <div className="flex flex-col">
               {filteredTables.map((item) => (
                 <button
+                  key={item}
                   type="button"
                   className="pl-8 pr-4 h-8 flex items-center hover:bg-gray-400"
                   onClick={() => onClick(item)}
