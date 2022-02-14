@@ -124,7 +124,7 @@ export function Databases(): JSX.Element {
           <button
             type="button"
             key={database.name}
-            className="p-4 bg-gray-300 flex justify-between"
+            className="p-4 bg-gray-200 hover:bg-gray-300 flex justify-between"
             onClick={() => handleSelectDatabase(database.name)}
           >
             <span>{database.name}</span>

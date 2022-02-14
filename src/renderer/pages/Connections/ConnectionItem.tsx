@@ -143,7 +143,7 @@ export function ConnectionItem({
       >
         <button
           key={connection.id}
-          className="flex-1 p-4 bg-gray-300 flex flex-col gap-4 justify-between"
+          className="flex-1 p-4 bg-gray-200 hover:bg-gray-300 flex flex-col gap-4 justify-between"
           onClick={handleConnect}
         >
           <header className="w-full flex justify-between">

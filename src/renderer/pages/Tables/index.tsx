@@ -2,10 +2,17 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { Insidebar } from 'renderer/components/Insidebar';
-import { Tabs } from 'renderer/components/Tabs';
 import { Spin } from 'renderer/components/Spin';
+import {
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
+} from 'renderer/components/Tabs';
 
 import { Sql } from './Sql';
+import { TableView } from './TableView';
 
 export function Tables(): JSX.Element {
   const { connection_id: connectionId } =
@@ -15,8 +22,8 @@ export function Tables(): JSX.Element {
 
   const [tables, setTables] = useState<string[]>([]);
 
-  const [tabs, setTabs] = useState<string[]>([]);
-  const [tabActive, setTabActive] = useState('sql');
+  const [tabSelected, setTabSelected] = useState(0);
+  const [tabs, setTabs] = useState<string[]>(['sql']);
 
   useEffect(() => {
     async function loadTables(): Promise<void> {
@@ -46,22 +53,39 @@ export function Tables(): JSX.Element {
         <Insidebar
           functions={[]}
           tables={tables}
-          onClick={(value) => {
-            setTabs((prevState) => [...prevState, value]);
-            setTabActive(value);
+          onClick={(tab) => {
+            setTabSelected(tabs.length);
+            setTabs((prevState) => [...prevState, tab]);
           }}
         />
 
-        <Tabs
-          tabs={tabs}
-          tabActive={tabActive}
-          onChange={setTabActive}
-          onRemove={(value) =>
-            setTabs((prevState) => prevState.filter((tab) => tab !== value))
-          }
-          sqlComponent={<Sql />}
-          tableComponent={<div>table component</div>}
-        />
+        <Tabs index={tabSelected} onChange={setTabSelected}>
+          <TabList>
+            {tabs.map((tab) => (
+              <Tab
+                key={tab}
+                onDelete={
+                  tab !== 'sql'
+                    ? (value) =>
+                        setTabs((prevState) =>
+                          prevState.filter((_, index) => index !== value)
+                        )
+                    : undefined
+                }
+              >
+                {tab}
+              </Tab>
+            ))}
+          </TabList>
+
+          <TabPanels>
+            {tabs.map((tab) => (
+              <TabPanel>
+                {tab === 'sql' ? <Sql /> : <TableView table={tab} />}
+              </TabPanel>
+            ))}
+          </TabPanels>
+        </Tabs>
       </div>
     </>
   );

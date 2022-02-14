@@ -101,10 +101,10 @@ export function Insidebar({
       height={Infinity}
       minConstraints={[220, Infinity]}
       maxConstraints={[500, Infinity]}
-      className="bg-gray-300 p-4 flex flex-col overflow-auto"
+      className="bg-gray-300 flex flex-col overflow-auto"
     >
       <div className="flex flex-col overflow-y-auto overflow-x-hidden">
-        <Form ref={searchFormRef} onSubmit={() => undefined}>
+        <Form ref={searchFormRef} onSubmit={() => undefined} className="m-4">
           <Input
             name="search"
             placeholder="search"
@@ -113,26 +113,22 @@ export function Insidebar({
           />
         </Form>
 
-        {/* {!!filteredFunctions.length && (
-          <Accordion>
-            <AccordionTitle>Functions</AccordionTitle>
-
-            {filteredFunctions.map((item) => (
-              <AccordionItem key={item}>{item}</AccordionItem>
-            ))}
-          </Accordion>
-        )} */}
-
         {!!filteredTables.length && (
-          <Accordion>
-            <AccordionTitle>Tables</AccordionTitle>
+          <>
+            <strong className="px-4 h-8 w-full">Tables</strong>
 
-            <div className="flex-1 flex flex-col overflow-auto">
+            <div className="flex flex-col">
               {filteredTables.map((item) => (
-                <AccordionItem key={item} name={item} onClick={onClick} />
+                <button
+                  type="button"
+                  className="pl-8 pr-4 h-8 flex items-center hover:bg-gray-400"
+                  onClick={() => onClick(item)}
+                >
+                  {item}
+                </button>
               ))}
             </div>
-          </Accordion>
+          </>
         )}
       </div>
     </ResizableBox>

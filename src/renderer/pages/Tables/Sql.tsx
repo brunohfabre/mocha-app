@@ -117,15 +117,11 @@ export function Sql(): JSX.Element {
 
   function handleUpdateRows(items: { [key: string]: string }) {
     Object.keys(items).forEach((item) => {
-      // const findRow = rows.find((row) => row.rowId === item);
-
       setRows((prevState) =>
         prevState.map((row) =>
           row.rowId === item ? Object.assign(row, items) : row
         )
       );
-
-      // console.log(findRow);
     });
   }
 
