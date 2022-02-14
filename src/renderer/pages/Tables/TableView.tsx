@@ -29,8 +29,6 @@ export function TableView({ table }: TableViewProps): JSX.Element {
   useEffect(() => {
     async function handleRunQuery() {
       try {
-        console.log('handle run query');
-
         const initialTime = Date.now();
 
         setIsLoading(true);
