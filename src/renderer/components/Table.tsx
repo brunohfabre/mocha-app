@@ -132,7 +132,6 @@ export function Table({
   useHotkeys(
     `${commandOrCtrl()}+s`,
     () => {
-      console.log(items);
       handleUpdate();
     },
     [items]
@@ -186,46 +185,6 @@ export function Table({
           </>
         ))}
       </div>
-      {/* <table className="bg-red-200 w-full">
-        <thead>
-          <tr>
-            {fields.map((field) => (
-              <th className="text-left whitespace-nowrap bg-red-300 sticky top-0">
-                {field.name}
-              </th>
-            ))}
-          </tr>
-        </thead>
-
-        <tbody>
-          {rows.map((row) => (
-            <tr>
-              {fields.map((field) => (
-                <td
-                  className={`whitespace-nowrap ${
-                    items[row.rowId] &&
-                    items[row.rowId][field.name] &&
-                    'bg-orange-400'
-                  }`}
-                >
-
-                  {field.type === 'text'
-                    ? row[field.name]
-                    : field.type === 'timestamp'
-                    ? format(row[field.name], 'yyyy-MM-dd hh:mm:ss')
-                    : JSON.stringify(row[field.name])}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table> */}
-
-      {/* {!!Object.keys(items).length && (
-        <button type="button" onClick={handleUpdate}>
-          save
-        </button>
-      )} */}
     </>
   );
 }

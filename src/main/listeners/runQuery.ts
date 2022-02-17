@@ -1,4 +1,6 @@
 import { ipcMain } from 'electron';
+import { format } from 'date-fns';
+
 import postgresDataTypes from '../../renderer/assets/dataTypes/postgres.json';
 
 import { connections } from '../connections';
@@ -48,7 +50,27 @@ export function runQuery(): void {
             name: field.name,
             type: postgresDataTypes[field.dataTypeID] || 'unknow',
           })),
-          rows,
+          rows: rows.map((row) => {
+            const newRow = {};
+
+            const keys = Object.keys(row);
+
+            keys.forEach((key) => {
+              const findField = fields.find((field) => field.name === key);
+
+              if (
+                ['date', 'timestamp'].includes(
+                  postgresDataTypes[findField.dataTypeID]
+                )
+              ) {
+                newRow[key] = format(row[key], 'yyyy-MM-dd HH:mm:ss.SSS');
+              } else {
+                newRow[key] = row[key];
+              }
+            });
+
+            return newRow;
+          }),
         };
       }
 
