@@ -80,13 +80,34 @@ export function runQuery(): void {
       ) {
         const [rows, fields] = await connection.connection.raw(query);
 
+        console.log(rows, fields);
+
         result = {
           count: rows.length,
           fields: fields.map((field: any) => ({
             name: field.name,
             type: field.type,
           })),
-          rows,
+          rows: rows.map((row) => {
+            const newRow = {};
+
+            const keys = Object.keys(row);
+
+            keys.forEach((key) => {
+              const findField = fields.find((field) => field.name === key);
+
+              if ([10, 12].includes(findField.type)) {
+                newRow[key] = format(
+                  new Date(row[key]),
+                  'yyyy-MM-dd HH:mm:ss.SSS'
+                );
+              } else {
+                newRow[key] = row[key];
+              }
+            });
+
+            return newRow;
+          }),
         };
       }
 
