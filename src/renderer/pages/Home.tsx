@@ -10,7 +10,7 @@ export function Home(): JSX.Element {
     <div className="flex-1 flex items-center justify-center">
       <h1>home page</h1>
 
-      <Dialog.Root defaultOpen>
+      <Dialog.Root>
         <Dialog.Trigger>
           <Button type="button" onClick={() => setModalVisible(true)}>
             open dialog-r tsconfig-paths/register
