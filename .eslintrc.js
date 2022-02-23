@@ -11,6 +11,12 @@ module.exports = {
     'react/jsx-no-bind': 'off',
     'react/require-default-props': 'off',
     'react/button-has-type': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '_',
+      },
+    ],
   },
   parserOptions: {
     ecmaVersion: 2020,

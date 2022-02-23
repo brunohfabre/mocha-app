@@ -15,7 +15,7 @@ export function TabPanel({
     <div
       className={`flex-1 ${
         index === indexSelected ? 'flex' : 'hidden'
-      } flex-col`}
+      } flex-col overflow-auto`}
     >
       {children}
     </div>

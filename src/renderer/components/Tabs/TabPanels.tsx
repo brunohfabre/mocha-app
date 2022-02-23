@@ -10,7 +10,7 @@ export function TabPanels({
   indexSelected,
 }: TabPanelsProps): JSX.Element {
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col overflow-auto">
       {React.Children.map(children, (child, index) => {
         return React.cloneElement(child, { index, indexSelected });
       })}

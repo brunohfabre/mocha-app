@@ -24,7 +24,7 @@ export function Tables(): JSX.Element {
 
   const [tabSelected, setTabSelected] = useState(0);
   const [tabs, setTabs] = useState<string[]>(['sql']);
-  const [panels, setPanels] = useState([() => <Sql />]);
+  const [panels, setPanels] = useState<(() => JSX.Element)[]>([]);
 
   useEffect(() => {
     async function loadTables(): Promise<void> {
@@ -36,6 +36,8 @@ export function Tables(): JSX.Element {
         });
 
         setTables(response.sort());
+
+        setPanels([() => <Sql tables={response.sort()} />]);
       } catch (err: any) {
         console.log(err.message);
       } finally {

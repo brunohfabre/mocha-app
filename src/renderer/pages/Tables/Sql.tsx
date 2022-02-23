@@ -1,20 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
 import { ResizableBox } from 'react-resizable';
-import { toast } from 'react-toastify';
+import ace, { Ace } from 'ace-builds';
+import AceEditor from 'react-ace';
+import 'ace-builds/src-noconflict/mode-sql';
+import 'ace-builds/src-noconflict/theme-textmate';
+import 'ace-builds/src-noconflict/ext-language_tools';
 import { v4 as uuid } from 'uuid';
 
-import { EditorState } from '@codemirror/state';
-import { EditorView, keymap, highlightActiveLine } from '@codemirror/view';
-import { defaultKeymap } from '@codemirror/commands';
-import { history, historyKeymap } from '@codemirror/history';
-import { indentOnInput } from '@codemirror/language';
-import { lineNumbers, highlightActiveLineGutter } from '@codemirror/gutter';
-import { defaultHighlightStyle } from '@codemirror/highlight';
-import { sql } from '@codemirror/lang-sql';
-
+import { Spin } from 'renderer/components/Spin';
 import { Button } from 'renderer/components/Button';
 import { Table } from 'renderer/components/Table';
-import { Spin } from 'renderer/components/Spin';
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 
 type FieldType = {
@@ -22,62 +18,49 @@ type FieldType = {
   type: string;
 };
 
-export function Sql(): JSX.Element {
+type SqlProps = {
+  tables: string[];
+};
+
+export function Sql({ tables }: SqlProps): JSX.Element {
   const { connection_id: connectionId } =
     useParams<{ connection_id: string }>();
 
-  const containerRef = useRef(null);
+  const editorRef = useRef<AceEditor>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [lastQuery, setLastQuery] = useState('');
   const [isQuired, setIsQuired] = useState(false);
-  const [finalValue, setFinalValue] = useState<any>();
   const [fields, setFields] = useState<FieldType[]>([]);
   const [rows, setRows] = useState<{ [key: string]: string }[]>([]);
   const [responseTime, setResponseTime] = useState(0);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    const langTools = ace.require('ace/ext/language_tools');
 
-    const startState = EditorState.create({
-      doc: '',
-      extensions: [
-        keymap.of([...defaultKeymap, ...historyKeymap]),
-        lineNumbers(),
-        highlightActiveLineGutter(),
-        history(),
-        indentOnInput(),
-        defaultHighlightStyle.fallback,
-        highlightActiveLine(),
-        sql(),
-        EditorView.lineWrapping,
-        EditorView.updateListener.of((update) => {
-          if (update.changes) {
-            const { text } = update.state.doc as any;
-
-            setFinalValue({
-              text: text.reduce(
-                (previousValue: string, currentValue: string) => {
-                  if (previousValue) {
-                    return `${previousValue} ${currentValue}`;
-                  }
-
-                  return currentValue;
-                },
-                ''
-              ),
-              selection: update.state.selection.ranges[0],
-            });
-          }
-        }),
-      ],
-    });
-
-    const _ = new EditorView({
-      state: startState,
-      parent: containerRef.current,
-    });
-  }, [containerRef]);
+    const sqlTablesCompleter = {
+      getCompletions: (
+        editor: Ace.Editor,
+        session: Ace.EditSession,
+        point: Ace.Point,
+        string: string,
+        callback: Ace.CompleterCallback
+      ): void => {
+        callback(
+          null,
+          tables.map(
+            (table) =>
+              ({
+                caption: table,
+                value: table,
+                meta: 'Table',
+              } as Ace.Completion)
+          )
+        );
+      },
+    };
+    langTools.addCompleter(sqlTablesCompleter);
+  }, [tables]);
 
   async function handleRunQuery() {
     try {
@@ -85,10 +68,11 @@ export function Sql(): JSX.Element {
 
       setIsLoading(true);
 
-      const value = finalValue.text.slice(
-        finalValue.selection.from,
-        finalValue.selection.to
-      );
+      if (!editorRef.current) {
+        return;
+      }
+
+      const value = editorRef.current.editor.getSelectedText();
 
       const response = await window.electron.invoke('run-query', {
         connectionId,
@@ -130,7 +114,21 @@ export function Sql(): JSX.Element {
       <Spin spinning={isLoading} />
 
       <section className="flex-1 bg-teal-100 flex flex-col justify-between overflow-auto">
-        <div ref={containerRef} className="flex-1 overflow-auto" />
+        <AceEditor
+          ref={editorRef}
+          width="100%"
+          mode="sql"
+          theme="textmate"
+          name="UNIQUE_ID_OF_DIV"
+          editorProps={{ $blockScrolling: true }}
+          setOptions={{
+            enableBasicAutocompletion: true,
+            enableLiveAutocompletion: true,
+            tabSize: 2,
+            fontSize: 14,
+            fontFamily: 'jetbrains-mono',
+          }}
+        />
 
         <div className="flex items-center gap-8 p-4 bg-teal-200 justify-end">
           {/* <span className="flex items-center gap-2">
