@@ -1,7 +1,6 @@
-import { ReactNode, useEffect, useRef, useState } from 'react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { ResizableBox } from 'react-resizable';
 
 import { Input } from './Input';

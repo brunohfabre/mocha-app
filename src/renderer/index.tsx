@@ -1,5 +1,5 @@
-import { render } from 'react-dom';
 import 'tailwindcss/tailwind.css';
+import { render } from 'react-dom';
 import './styles/global.css';
 
 import { App } from './App';

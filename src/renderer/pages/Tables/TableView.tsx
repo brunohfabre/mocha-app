@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { v4 as uuid } from 'uuid';
-
-import { Spin } from 'renderer/components/Spin';
-import { Table } from 'renderer/components/Table';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { v4 as uuid } from 'uuid';
+
+import { Spin } from '@components/Spin';
+import { Table } from '@components/Table';
 
 type TableViewProps = {
   table: string;

@@ -1,12 +1,12 @@
 import { Routes as Switch, Route } from 'react-router-dom';
 
-import { Notes } from 'renderer/pages/Notes';
-import { Rest } from 'renderer/pages/Rest';
-import { Table } from '../pages/Table';
-import { Home } from '../pages/Home';
-import { Connections } from '../pages/Connections';
-import { Databases } from '../pages/Databases';
-import { Tables } from '../pages/Tables';
+import { Connections } from '@pages/Connections';
+import { Databases } from '@pages/Databases';
+import { Home } from '@pages/Home';
+import { Notes } from '@pages/Notes';
+import { Rest } from '@pages/Rest';
+import { Table } from '@pages/Table';
+import { Tables } from '@pages/Tables';
 
 export function AppRoutes(): JSX.Element {
   return (

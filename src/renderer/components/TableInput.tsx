@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import ContentEditable from 'react-contenteditable';
 
 type FieldType = {
   name: string;

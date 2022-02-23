@@ -1,15 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Insidebar } from 'renderer/components/Insidebar';
-import { Spin } from 'renderer/components/Spin';
-import {
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
-} from 'renderer/components/Tabs';
+import { Insidebar } from '@components/Insidebar';
+import { Spin } from '@components/Spin';
+import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@components/Tabs';
 
 import { Sql } from './Sql';
 import { TableView } from './TableView';

@@ -1,16 +1,15 @@
+import { FormHandles } from '@unform/core';
+import { Form } from '@unform/web';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import getValidationErrors from 'renderer/helpers/getValidationErrors';
+import { api } from 'renderer/services/api';
 import * as Yup from 'yup';
 
-import { Form } from '@unform/web';
-
-import { useRef, useState } from 'react';
-import { api } from 'renderer/services/api';
-import { FormHandles } from '@unform/core';
-import getValidationErrors from 'renderer/helpers/getValidationErrors';
-import { Input } from '../components/Input';
-import { Button } from '../components/Button';
-import { LinkButton } from '../components/LinkButton';
-import { Spin } from '../components/Spin';
+import { Button } from '@components/Button';
+import { Input } from '@components/Input';
+import { LinkButton } from '@components/LinkButton';
+import { Spin } from '@components/Spin';
 
 interface FormData {
   firstName: string;

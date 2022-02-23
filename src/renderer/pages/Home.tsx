@@ -1,6 +1,8 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { useState } from 'react';
 
+import { Button } from '@components/Button';
+
 export function Home(): JSX.Element {
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -10,9 +12,9 @@ export function Home(): JSX.Element {
 
       <Dialog.Root defaultOpen>
         <Dialog.Trigger>
-          <button type="button" onClick={() => setModalVisible(true)}>
-            open dialog
-          </button>
+          <Button type="button" onClick={() => setModalVisible(true)}>
+            open dialog-r tsconfig-paths/register
+          </Button>
         </Dialog.Trigger>
         <Dialog.Portal container={document.getElementById('modal')}>
           <Dialog.Overlay className="fixed top-0 right-0 bottom-0 left-0 flex items-center justify-center bg-black/50 p-4">

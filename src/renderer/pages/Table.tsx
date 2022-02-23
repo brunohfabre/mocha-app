@@ -1,5 +1,5 @@
-import { Insidebar } from 'renderer/components/Insidebar';
-import { Tabs } from 'renderer/components/TabsOld';
+import { Insidebar } from '@components/Insidebar';
+import { Tabs } from '@components/TabsOld';
 
 export function Table(): JSX.Element {
   return (

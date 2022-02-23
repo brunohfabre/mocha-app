@@ -1,17 +1,17 @@
-import { ResizableBox } from 'react-resizable';
 import ace, { Ace } from 'ace-builds';
-import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-sql';
 import 'ace-builds/src-noconflict/theme-textmate';
 import 'ace-builds/src-noconflict/ext-language_tools';
+import { useEffect, useRef, useState } from 'react';
+import AceEditor from 'react-ace';
+import { ResizableBox } from 'react-resizable';
+import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { v4 as uuid } from 'uuid';
 
-import { Spin } from 'renderer/components/Spin';
-import { Button } from 'renderer/components/Button';
-import { Table } from 'renderer/components/Table';
-import { useEffect, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
-import { useParams } from 'react-router-dom';
+import { Button } from '@components/Button';
+import { Spin } from '@components/Spin';
+import { Table } from '@components/Table';
 
 type FieldType = {
   name: string;

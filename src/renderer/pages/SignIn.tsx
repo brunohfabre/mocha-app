@@ -1,15 +1,16 @@
-import { useNavigate } from 'react-router-dom';
-import { useContext, useRef, useState } from 'react';
-import * as Yup from 'yup';
-import { api } from 'renderer/services/api';
-import { AuthContext } from 'renderer/contexts/AuthContext';
-import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
+import { Form } from '@unform/web';
+import { useContext, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from 'renderer/contexts/AuthContext';
 import getValidationErrors from 'renderer/helpers/getValidationErrors';
-import { LinkButton } from '../components/LinkButton';
-import { Button } from '../components/Button';
-import { Input } from '../components/Input';
-import { Spin } from '../components/Spin';
+import { api } from 'renderer/services/api';
+import * as Yup from 'yup';
+
+import { Button } from '@components/Button';
+import { Input } from '@components/Input';
+import { LinkButton } from '@components/LinkButton';
+import { Spin } from '@components/Spin';
 
 interface FormData {
   email: string;

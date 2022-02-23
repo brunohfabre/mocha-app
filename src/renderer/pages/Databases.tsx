@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-import { Button } from 'renderer/components/Button';
-import { Input } from 'renderer/components/Input';
-import { Modal } from 'renderer/components/Modal';
-import { Spin } from 'renderer/components/Spin';
+import { Button } from '@components/Button';
+import { Input } from '@components/Input';
+import { Modal } from '@components/Modal';
+import { Spin } from '@components/Spin';
 
 type DatabaseType = {
   name: string;

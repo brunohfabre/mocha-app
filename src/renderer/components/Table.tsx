@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
 import { omit } from 'lodash';
-import { useParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-
+import { useParams } from 'react-router-dom';
 import { Spin } from 'renderer/components/Spin';
 
 type FieldType = {

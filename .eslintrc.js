@@ -1,5 +1,6 @@
 module.exports = {
   extends: 'erb',
+  plugins: ['eslint-plugin-import-helpers'],
   rules: {
     // A temporary hack related to IDE not resolving correct package.json
     'import/no-extraneous-dependencies': 'off',
@@ -15,6 +16,26 @@ module.exports = {
       'error',
       {
         argsIgnorePattern: '_',
+      },
+    ],
+    'import-helpers/order-imports': [
+      'warn',
+      {
+        newlinesBetween: 'always',
+        groups: [
+          'module',
+          '/^@assets/',
+          '/^@helpers/',
+          '/^@contexts/',
+          '/^@services/',
+          '/^@pages/',
+          '/^@components/',
+          ['parent', 'sibling', 'index'],
+        ],
+        alphabetize: {
+          order: 'asc',
+          ignoreCase: true,
+        },
       },
     ],
   },

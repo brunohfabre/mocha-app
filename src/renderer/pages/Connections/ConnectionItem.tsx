@@ -1,18 +1,19 @@
-import { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
+import { useRef, useState } from 'react';
+import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 
-import getValidationErrors from 'renderer/helpers/getValidationErrors';
+import getValidationErrors from '@helpers/getValidationErrors';
 
-import { Alert } from 'renderer/components/Alert';
-import { Input } from 'renderer/components/Input';
-import { Button } from 'renderer/components/Button';
-import { Spin } from 'renderer/components/Spin';
-import { toast } from 'react-toastify';
-import { api } from 'renderer/services/api';
+import { api } from '@services/api';
+
+import { Alert } from '@components/Alert';
+import { Button } from '@components/Button';
+import { Input } from '@components/Input';
+import { Spin } from '@components/Spin';
 
 type ConnectionType = 'POSTGRES' | 'MYSQL' | 'MARIADB';
 
