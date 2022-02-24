@@ -13,7 +13,7 @@ export function Home(): JSX.Element {
       <Dialog.Root>
         <Dialog.Trigger>
           <Button type="button" onClick={() => setModalVisible(true)}>
-            open dialog-r tsconfig-paths/register
+            open test dialog
           </Button>
         </Dialog.Trigger>
         <Dialog.Portal container={document.getElementById('modal')}>

@@ -42,14 +42,25 @@ export function Tables(): JSX.Element {
     loadTables();
   }, [connectionId]);
 
-  function handleDeleteTab(value: number): void {
-    const tabsLength = tabs.length;
+  function handleDeleteTab(tabIndex: number): void {
+    let tabsLength = 0;
 
-    setTabs((prevState) => prevState.filter((_, index) => index !== value));
-    setPanels((prevState) => prevState.filter((_, index) => index !== value));
+    setTabs((prevState) => {
+      const newTabs = prevState.filter((_, index) => index !== tabIndex);
 
-    if (tabsLength <= 2) {
-      setTabSelected(0);
+      tabsLength = newTabs.length;
+
+      return newTabs;
+    });
+    setPanels((prevState) =>
+      prevState.filter((_, index) => index !== tabIndex)
+    );
+
+    if (
+      (tabSelected === tabIndex && tabIndex === tabsLength) ||
+      tabSelected > tabIndex
+    ) {
+      setTabSelected(tabsLength - 1);
     }
   }
 
