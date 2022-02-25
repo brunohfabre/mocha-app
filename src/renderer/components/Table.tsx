@@ -4,6 +4,8 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { useParams } from 'react-router-dom';
 import { Spin } from 'renderer/components/Spin';
 
+import { commandOrCtrl } from '@helpers/commandOrCtrl';
+
 type FieldType = {
   name: string;
   type: string;
@@ -72,9 +74,6 @@ export function Table({
   const [isLoading, setIsLoading] = useState(false);
   const [items, setItems] = useState<{ [key: string]: string }>({});
 
-  const commandOrCtrl = () =>
-    window.navigator.platform.match(/^Mac/) ? 'command' : 'ctrl';
-
   async function handleUpdate(): Promise<void> {
     try {
       if (!Object.keys(items).length) {
@@ -132,6 +131,9 @@ export function Table({
     `${commandOrCtrl()}+s`,
     () => {
       handleUpdate();
+    },
+    {
+      enableOnTags: ['INPUT', 'SELECT', 'TEXTAREA'],
     },
     [items]
   );

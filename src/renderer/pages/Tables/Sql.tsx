@@ -4,10 +4,13 @@ import 'ace-builds/src-noconflict/theme-textmate';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import { useEffect, useRef, useState } from 'react';
 import AceEditor from 'react-ace';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { ResizableBox } from 'react-resizable';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { v4 as uuid } from 'uuid';
+
+import { commandOrCtrl } from '@helpers/commandOrCtrl';
 
 import { Button } from '@components/Button';
 import { Spin } from '@components/Spin';
@@ -98,6 +101,17 @@ export function Sql({ tables }: SqlProps): JSX.Element {
       setIsLoading(false);
     }
   }
+
+  useHotkeys(
+    `${commandOrCtrl()}+return`,
+    () => {
+      handleRunQuery();
+    },
+    {
+      enableOnTags: ['INPUT', 'SELECT', 'TEXTAREA'],
+    },
+    []
+  );
 
   function handleUpdateRows(items: { [key: string]: string }) {
     Object.keys(items).forEach((item) => {
