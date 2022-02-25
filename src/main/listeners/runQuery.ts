@@ -1,8 +1,7 @@
-import { ipcMain } from 'electron';
 import { format } from 'date-fns';
+import { ipcMain } from 'electron';
 
 import postgresDataTypes from '../../renderer/assets/dataTypes/postgres.json';
-
 import { connections } from '../connections';
 
 interface ShowDatabasesData {
@@ -79,8 +78,6 @@ export function runQuery(): void {
         connection.info.type === 'MARIADB'
       ) {
         const [rows, fields] = await connection.connection.raw(query);
-
-        console.log(rows, fields);
 
         result = {
           count: rows.length,

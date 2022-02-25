@@ -1,5 +1,4 @@
 import { ipcMain } from 'electron';
-import knex from 'knex';
 
 import { connections } from '../connections';
 
@@ -74,9 +73,49 @@ export function updateField(): void {
         connection.info.type === 'MYSQL' ||
         connection.info.type === 'MARIADB'
       ) {
-        const response = await connection.connection.raw('');
+        const response = await connection.connection.raw(
+          `SHOW COLUMNS from ${table}`
+        );
 
-        console.log(response);
+        const findPrimaryKey = response[0].find(
+          (row: { Field: string; Type: string; Key: string }) =>
+            row.Key === 'PRI'
+        );
+
+        const primaryKey = {
+          name: findPrimaryKey.Field,
+          type: findPrimaryKey.Type.split('(')[0],
+        };
+
+        rows.forEach((row) => {
+          let newValues = '';
+
+          Object.keys(row.changed).forEach((item) => {
+            const value = `${item} = ${
+              ['boolean', 'number', 'int', 'bigint'].includes(
+                typeof row.changed[item]
+              )
+                ? row.changed[item]
+                : `'${row.changed[item]}'`
+            }`;
+
+            if (newValues.length) {
+              newValues = `${newValues}, ${value}`;
+            } else {
+              newValues = value;
+            }
+          });
+
+          queries.push(`
+            UPDATE ${table}
+            SET ${newValues}
+            WHERE ${primaryKey.name} = ${
+            primaryKey.type === 'text'
+              ? `'${row.initial[primaryKey.name]}'`
+              : row.initial[primaryKey.name]
+          };
+          `);
+        });
       }
 
       connection.connection.transaction((trx) => {
@@ -86,8 +125,6 @@ export function updateField(): void {
           )
         );
       });
-
-      // const result = await connection.connection.raw(queries[0]);
 
       return true;
     }
