@@ -1,7 +1,6 @@
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { ipcMain } from 'electron';
 
-import postgresDataTypes from '../../renderer/assets/dataTypes/postgres.json';
 import { connections } from '../connections';
 
 interface ShowDatabasesData {
@@ -11,13 +10,45 @@ interface ShowDatabasesData {
 
 type FieldType = {
   name: string;
-  type: string;
 };
 
 interface QueryResponse {
-  count: 0;
+  count: number;
   fields: FieldType[];
   rows: { [key: string]: string }[];
+}
+
+function processResult(
+  fields: { name: string }[],
+  rows: { [key: string]: string }[]
+) {
+  return {
+    count: rows.length,
+    fields: fields.map((field: { name: string }) => ({
+      name: field.name,
+    })),
+    rows: rows.map((row: { [key: string]: string }) => {
+      const newRow = {} as {
+        [key: string]: string;
+      };
+
+      Object.keys(row).forEach((key) => {
+        const item = row[key];
+
+        if (item === null || item === undefined) {
+          newRow[key] = String(item);
+        } else if (typeof item === 'number') {
+          newRow[key] = item;
+        } else if (typeof item === 'object' && isValid(new Date(item))) {
+          newRow[key] = format(new Date(item), 'yyyy-MM-dd HH:mm:ss.SSS');
+        } else {
+          newRow[key] = String(item);
+        }
+      });
+
+      return newRow;
+    }),
+  };
 }
 
 export function runQuery(): void {
@@ -32,45 +63,16 @@ export function runQuery(): void {
         throw new Error('Connection not found.');
       }
 
-      let result = {
-        count: 0,
-        fields: [],
-        rows: [],
+      let result = {} as {
+        count: number;
+        fields: { name: string }[];
+        rows: { [key: string]: string }[];
       };
 
       if (connection.info.type === 'POSTGRES') {
-        const { fields, rows, rowCount } = await connection.connection.raw(
-          query
-        );
+        const { fields, rows } = await connection.connection.raw(query);
 
-        result = {
-          count: rowCount as number,
-          fields: fields.map((field: any) => ({
-            name: field.name,
-            type: postgresDataTypes[field.dataTypeID] || 'unknow',
-          })),
-          rows: rows.map((row) => {
-            const newRow = {};
-
-            const keys = Object.keys(row);
-
-            keys.forEach((key) => {
-              const findField = fields.find((field) => field.name === key);
-
-              if (
-                ['date', 'timestamp'].includes(
-                  postgresDataTypes[findField.dataTypeID]
-                )
-              ) {
-                newRow[key] = format(row[key], 'yyyy-MM-dd HH:mm:ss.SSS');
-              } else {
-                newRow[key] = row[key];
-              }
-            });
-
-            return newRow;
-          }),
-        };
+        result = processResult(fields, rows);
       }
 
       if (
@@ -79,33 +81,7 @@ export function runQuery(): void {
       ) {
         const [rows, fields] = await connection.connection.raw(query);
 
-        result = {
-          count: rows.length,
-          fields: fields.map((field: any) => ({
-            name: field.name,
-            type: field.type,
-          })),
-          rows: rows.map((row) => {
-            const newRow = {};
-
-            const keys = Object.keys(row);
-
-            keys.forEach((key) => {
-              const findField = fields.find((field) => field.name === key);
-
-              if ([10, 12].includes(findField.type)) {
-                newRow[key] = format(
-                  new Date(row[key]),
-                  'yyyy-MM-dd HH:mm:ss.SSS'
-                );
-              } else {
-                newRow[key] = row[key];
-              }
-            });
-
-            return newRow;
-          }),
-        };
+        result = processResult(fields, rows);
       }
 
       return result;

@@ -113,7 +113,9 @@ export function Sql({ tables }: SqlProps): JSX.Element {
     []
   );
 
-  function handleUpdateRows(items: { [key: string]: string }) {
+  function handleUpdateRows(items: {
+    [key: string]: { [key: string]: string | number };
+  }) {
     Object.keys(items).forEach((item) => {
       setRows((prevState) =>
         prevState.map((row) =>

@@ -8,7 +8,6 @@ import { commandOrCtrl } from '@helpers/commandOrCtrl';
 
 type FieldType = {
   name: string;
-  type: string;
 };
 
 type RowType = { [key: string]: string };
@@ -16,7 +15,9 @@ type RowType = { [key: string]: string };
 interface TableProps {
   fields: FieldType[];
   rows: RowType[];
-  updateRows: (items: { [key: string]: string }) => void;
+  updateRows: (items: {
+    [key: string]: { [key: string]: string | number };
+  }) => void;
   lastQuery?: string;
 }
 
@@ -39,7 +40,7 @@ function Row({ defaultValue, isUpdated, setToUpdate }: RowProps): JSX.Element {
         setInitialWidth(inputRef.current.scrollWidth);
       }
     }
-  }, [inputRef]);
+  }, [inputRef, initialWidth]);
 
   function handleBlur(): void {
     if (inputRef.current) {
@@ -72,7 +73,9 @@ export function Table({
     useParams<{ connection_id: string }>();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [items, setItems] = useState<{ [key: string]: string }>({});
+  const [items, setItems] = useState<{
+    [key: string]: { [key: string]: string | number };
+  }>({});
 
   async function handleUpdate(): Promise<void> {
     try {
@@ -141,6 +144,7 @@ export function Table({
   return (
     <>
       <Spin spinning={isLoading} />
+
       <div
         className="w-full grid"
         style={{
@@ -156,9 +160,12 @@ export function Table({
             {fields.map((field) => (
               <Row
                 defaultValue={row[field.name]}
-                isUpdated={items[row.rowId] && items[row.rowId][field.name]}
+                isUpdated={items[row.rowId] && !!items[row.rowId][field.name]}
                 setToUpdate={(value) => {
-                  if (row[field.name] === value) {
+                  const teste =
+                    typeof row[field.name] === 'number' ? Number(value) : value;
+
+                  if (row[field.name] === teste) {
                     setItems((prevState) => {
                       const newState = omit(prevState[row.rowId], [field.name]);
 
@@ -176,7 +183,7 @@ export function Table({
                       ...prevState,
                       [row.rowId]: {
                         ...prevState[row.rowId],
-                        [field.name]: value,
+                        [field.name]: teste,
                       },
                     }));
                   }
