@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
+import { usePageTitle } from 'renderer/hooks/pageTitleHook';
 
 import { Insidebar } from '@components/Insidebar';
 import { Spin } from '@components/Spin';
@@ -11,6 +12,9 @@ import { TableView } from './TableView';
 export function Tables(): JSX.Element {
   const { connection_id: connectionId } =
     useParams<{ connection_id: string }>();
+  const { state } = useLocation();
+
+  const { addToTitle } = usePageTitle();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -19,6 +23,12 @@ export function Tables(): JSX.Element {
   const [tabSelected, setTabSelected] = useState(0);
   const [tabs, setTabs] = useState<string[]>(['sql']);
   const [panels, setPanels] = useState<(() => JSX.Element)[]>([]);
+
+  useEffect(() => {
+    const { database } = state as { database: string };
+
+    addToTitle(database);
+  }, [state]);
 
   useEffect(() => {
     async function loadTables(): Promise<void> {

@@ -3,6 +3,7 @@ import { Form } from '@unform/web';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { usePageTitle } from 'renderer/hooks/pageTitleHook';
 
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
@@ -18,6 +19,8 @@ export function Databases(): JSX.Element {
   const navigate = useNavigate();
   const { connection_id: connectionId } =
     useParams<{ connection_id: string }>();
+
+  const { replaceTitle } = usePageTitle();
 
   const searchFormRef = useRef<FormHandles>(null);
 
@@ -38,9 +41,15 @@ export function Databases(): JSX.Element {
           connectionId,
         });
 
+        const info = await window.electron.invoke('get-connection-info', {
+          id: connectionId,
+        });
+
         setDatabases(response);
-        setDatabases(response);
+
+        replaceTitle(info.name);
       } catch (err: any) {
+        console.log(err.message);
         toast.error(err.message.toLowerCase().split('error:')[1].trimStart());
       } finally {
         setIsLoading(false);
@@ -50,7 +59,7 @@ export function Databases(): JSX.Element {
     if (connectionId) {
       loadDatabases();
     }
-  }, [connectionId]);
+  }, [connectionId, replaceTitle]);
 
   useEffect(() => {
     setFilteredDatabases(databases);
@@ -79,7 +88,11 @@ export function Databases(): JSX.Element {
         database,
       });
 
-      navigate(`${database}/tables`);
+      navigate(`${database}/tables`, {
+        state: {
+          database,
+        },
+      });
     } catch (err: any) {
       console.log(err.message);
     } finally {
