@@ -1,16 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
-import * as Yup from 'yup';
+import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
+import { Alert } from 'renderer/components/Alert';
 import { Button } from 'renderer/components/Button';
 import { Input } from 'renderer/components/Input';
 import { Modal } from 'renderer/components/Modal';
-import { Alert } from 'renderer/components/Alert';
 import { Spin } from 'renderer/components/Spin';
-import { FormHandles } from '@unform/core';
 import getValidationErrors from 'renderer/helpers/getValidationErrors';
-import { toast } from 'react-toastify';
+import { usePageTitle } from 'renderer/hooks/pageTitleHook';
 import { api } from 'renderer/services/api';
+import * as Yup from 'yup';
+
 import { ConnectionItem } from './ConnectionItem';
 
 interface FormData {
@@ -19,10 +20,6 @@ interface FormData {
   port: string;
   user: string;
   password: string;
-}
-
-interface SearchFormData {
-  search: string;
 }
 
 type ConnectionType = 'POSTGRES' | 'MYSQL' | 'MARIADB';
@@ -61,6 +58,7 @@ function ConnectionTypeButton({
 export function Connections(): JSX.Element {
   const formRef = useRef<FormHandles>(null);
   const searchFormRef = useRef<FormHandles>(null);
+  const { replaceTitle } = usePageTitle();
 
   const [isLoading, setIsLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -72,6 +70,10 @@ export function Connections(): JSX.Element {
   const [connectionHasBeenTested, setConnectionHasBeenTested] = useState(false);
   const [withoutTestingAlert, setWithoutTestingAlert] = useState(false);
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    replaceTitle('Databases');
+  }, [replaceTitle]);
 
   useEffect(() => {
     setFilteredConnections(connections);
@@ -213,8 +215,6 @@ export function Connections(): JSX.Element {
         formRef.current?.setErrors(errors);
         return;
       }
-
-      console.log(err.message);
 
       toast.error(err.message.toLowerCase().split('error:')[1].trimStart());
     } finally {

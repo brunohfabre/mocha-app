@@ -1,8 +1,11 @@
 import { useLocation, useNavigate } from 'react-router-dom';
+import { usePageTitle } from 'renderer/hooks/pageTitleHook';
 
 export function Header(): JSX.Element {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const { title } = usePageTitle();
 
   const showBackButton =
     location.pathname.split('/').filter((item) => Boolean(item)).length > 1;
@@ -35,7 +38,7 @@ export function Header(): JSX.Element {
           </button>
         )}
 
-        <span className={!showBackButton ? 'pl-4' : ''}>title</span>
+        <span className={!showBackButton ? 'pl-4' : ''}>{title}</span>
       </div>
 
       {/* <span>project_name ⌄</span> */}

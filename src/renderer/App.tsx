@@ -5,13 +5,14 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { AppProvider } from './contexts';
+import { PageTitleProvider } from './hooks/pageTitleHook';
 import { Routes } from './routes';
 
 Modal.setAppElement('#root');
 
 export function App() {
   return (
-    <>
+    <PageTitleProvider>
       <ToastContainer />
 
       <Router>
@@ -19,6 +20,6 @@ export function App() {
           <Routes />
         </AppProvider>
       </Router>
-    </>
+    </PageTitleProvider>
   );
 }

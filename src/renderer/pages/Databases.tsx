@@ -41,8 +41,6 @@ export function Databases(): JSX.Element {
         setDatabases(response);
         setDatabases(response);
       } catch (err: any) {
-        console.log(err.message);
-
         toast.error(err.message.toLowerCase().split('error:')[1].trimStart());
       } finally {
         setIsLoading(false);
