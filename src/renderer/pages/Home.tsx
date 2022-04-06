@@ -1,10 +1,17 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { usePageTitle } from 'renderer/hooks/pageTitleHook';
 
 import { Button } from '@components/Button';
 
 export function Home(): JSX.Element {
   const [modalVisible, setModalVisible] = useState(false);
+
+  const { replaceTitle } = usePageTitle();
+
+  useEffect(() => {
+    replaceTitle('Home');
+  }, []);
 
   return (
     <div className="flex-1 flex items-center justify-center">

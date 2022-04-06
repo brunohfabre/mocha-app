@@ -1,12 +1,13 @@
 import { Routes as Switch, Route } from 'react-router-dom';
 
 import { Connections } from '@pages/Connections';
-import { Databases } from '@pages/Databases';
+import { Databases } from '@pages/Connections/Databases';
+import { Tables } from '@pages/Connections/Databases/Tables';
+import { Table } from '@pages/Connections/Databases/Tables/Table';
 import { Home } from '@pages/Home';
 import { Notes } from '@pages/Notes';
+import { Profile } from '@pages/Profile';
 import { Rest } from '@pages/Rest';
-import { Table } from '@pages/Table';
-import { Tables } from '@pages/Tables';
 
 export function AppRoutes(): JSX.Element {
   return (
@@ -30,6 +31,8 @@ export function AppRoutes(): JSX.Element {
       <Route path="/notes" element={<Notes />} />
 
       <Route path="/rest" element={<Rest />} />
+
+      <Route path="/profile" element={<Profile />} />
     </Switch>
   );
 }
