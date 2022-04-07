@@ -6,23 +6,33 @@ type UserType = {
   firstName: string;
   lastName: string;
   email: string;
+  phone: string;
 };
 
-interface SignInData {
+type SignInData = {
   user: UserType;
   token: string;
-}
-interface AuthContextData {
+};
+
+type UpdateProfileData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+};
+
+type AuthContextData = {
   isSigned: boolean;
   token: string;
   user: UserType | null;
   signIn: (data: SignInData) => void;
   signOut: () => void;
-}
+  updateProfile: (data: UpdateProfileData) => void;
+};
 
-interface AuthContextProviderProps {
+type AuthContextProviderProps = {
   children: ReactNode;
-}
+};
 
 export const AuthContext = createContext<AuthContextData>(
   {} as AuthContextData
@@ -72,8 +82,21 @@ export function AuthContextProvider({
     navigate('/');
   }
 
+  function updateProfile(data: UpdateProfileData): void {
+    if (user) {
+      const { id } = user;
+      const newData = { id, ...data };
+
+      localStorage.setItem('@mocha:user', JSON.stringify(newData));
+
+      setUser(newData);
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ isSigned, token, user, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ isSigned, token, user, signIn, signOut, updateProfile }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -1,9 +1,11 @@
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { AuthContext } from '../contexts/AuthContext';
 
 export function Sidebar(): JSX.Element {
+  const navigate = useNavigate();
   const { signOut } = useContext(AuthContext);
 
   return (
@@ -39,13 +41,33 @@ export function Sidebar(): JSX.Element {
         </li>
       </ul>
 
-      <button
-        type="button"
-        className="w-12 h-12 flex items-center justify-center"
-        onClick={signOut}
-      >
-        sair
-      </button>
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger className="flex items-center justify-center py-4">
+          <div className="w-8 h-8 bg-green-300" />
+          {/* <button
+            type="button"
+            className="flex items-center justify-center py-4"
+            onClick={signOut}
+          >
+            <div className="w-8 h-8 bg-red-500" />
+          </button> */}
+        </DropdownMenu.Trigger>
+
+        <DropdownMenu.Content className="bg-red-100 py-2 w-40">
+          <DropdownMenu.Item
+            className="cursor-pointer hover:bg-red-200"
+            onClick={() => navigate('/profile')}
+          >
+            profile
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            className="cursor-pointer hover:bg-red-200"
+            onClick={signOut}
+          >
+            signout
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
     </div>
   );
 }
