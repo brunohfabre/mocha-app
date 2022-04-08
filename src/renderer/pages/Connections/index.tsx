@@ -1,6 +1,6 @@
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Alert } from 'renderer/components/Alert';
 import { Button } from 'renderer/components/Button';
@@ -11,6 +11,8 @@ import getValidationErrors from 'renderer/helpers/getValidationErrors';
 import { usePageTitle } from 'renderer/hooks/pageTitleHook';
 import { api } from 'renderer/services/api';
 import * as Yup from 'yup';
+
+import { ProjectContext } from '@contexts/ProjectContext';
 
 import { ConnectionItem } from './ConnectionItem';
 
@@ -56,8 +58,11 @@ function ConnectionTypeButton({
 }
 
 export function Connections(): JSX.Element {
+  const { projectSelected } = useContext(ProjectContext);
+
   const formRef = useRef<FormHandles>(null);
   const searchFormRef = useRef<FormHandles>(null);
+
   const { replaceTitle } = usePageTitle();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -97,7 +102,11 @@ export function Connections(): JSX.Element {
     async function loadConnections(): Promise<void> {
       setIsLoading(true);
 
-      const response = await api.get('/connections');
+      const response = await api.get('/connections', {
+        headers: {
+          'x-project-selected': projectSelected.id,
+        },
+      });
 
       setConnections(response.data);
 
@@ -105,7 +114,7 @@ export function Connections(): JSX.Element {
     }
 
     loadConnections();
-  }, [setIsLoading]);
+  }, [setIsLoading, projectSelected.id]);
 
   function handleCloseModal(): void {
     setModalVisible(false);
@@ -121,14 +130,22 @@ export function Connections(): JSX.Element {
 
       const { name, host, port, user, password } = data as FormData;
 
-      const response = await api.post('/connections', {
-        type: typeSelected,
-        name,
-        host,
-        port: Number(port),
-        user,
-        password,
-      });
+      const response = await api.post(
+        '/connections',
+        {
+          type: typeSelected,
+          name,
+          host,
+          port: Number(port),
+          user,
+          password,
+        },
+        {
+          headers: {
+            'x-project-selected': projectSelected.id,
+          },
+        }
+      );
 
       setConnections((state) => [...state, response.data]);
 
@@ -162,6 +179,8 @@ export function Connections(): JSX.Element {
 
         return;
       }
+
+      setIsLoading(true);
 
       handleCreateConnection();
     } catch (err: any) {

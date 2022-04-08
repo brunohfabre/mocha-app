@@ -28,6 +28,7 @@ module.exports = {
           '/^@helpers/',
           '/^@contexts/',
           '/^@services/',
+          '/^@hooks/',
           '/^@pages/',
           '/^@components/',
           ['parent', 'sibling', 'index'],

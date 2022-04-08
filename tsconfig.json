@@ -17,6 +17,7 @@
       "@helpers/*": ["renderer/helpers/*"],
       "@pages/*": ["renderer/pages/*"],
       "@services/*": ["renderer/services/*"],
+      "@hooks/*": ["renderer/hooks/*"],
     },
     "noUnusedLocals": true,
     "noUnusedParameters": true,
