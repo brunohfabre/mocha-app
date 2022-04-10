@@ -4,7 +4,6 @@ import { useContext, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from 'renderer/contexts/AuthContext';
 import getValidationErrors from 'renderer/helpers/getValidationErrors';
-import { api } from 'renderer/services/api';
 import * as Yup from 'yup';
 
 import { Button } from '@components/Button';
@@ -43,12 +42,7 @@ export function SignIn(): JSX.Element {
 
       setIsLoading(true);
 
-      const response = await api.post('/sessions', {
-        email,
-        password,
-      });
-
-      signIn(response.data);
+      await signIn({ email, password });
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErrors(err);

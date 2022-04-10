@@ -3,6 +3,7 @@ import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { useContext, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 
 import getValidationErrors from '@helpers/getValidationErrors';
@@ -59,11 +60,7 @@ export function Header(): JSX.Element {
 
       const { title } = data;
 
-      const response = await api.post(`/projects`, {
-        title,
-      });
-
-      createProject(response.data);
+      await createProject({ title });
     } catch (err: any) {
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErrors(err);
@@ -74,6 +71,18 @@ export function Header(): JSX.Element {
       setIsLoading(false);
 
       setOpen(false);
+    }
+  }
+
+  async function handleDeleteProject(id: string): Promise<void> {
+    try {
+      setIsLoading(true);
+
+      await api.delete(`/projects/${id}`);
+
+      toast.success('Project deleted.');
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -132,10 +141,26 @@ export function Header(): JSX.Element {
           <DropdownMenu.Content className="bg-red-100 py-2 w-40">
             {projects.map((project) => (
               <DropdownMenu.Item
-                className="cursor-pointer hover:bg-red-200"
+                key={project.id}
+                className={`cursor-pointer hover:bg-red-300 flex justify-between items-center ${
+                  project.id === projectSelected.id
+                    ? 'bg-red-200'
+                    : 'bg-red-100'
+                }`}
                 onClick={() => selectProject(project.id)}
               >
                 {project.title}
+
+                <button
+                  className="p-2 hover:bg-red-400"
+                  onClick={(event) => {
+                    event.stopPropagation();
+
+                    handleDeleteProject(project.id);
+                  }}
+                >
+                  X
+                </button>
               </DropdownMenu.Item>
             ))}
 

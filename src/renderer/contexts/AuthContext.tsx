@@ -1,6 +1,8 @@
 import { createContext, ReactNode, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { api } from '@services/api';
+
 type UserType = {
   id: string;
   firstName: string;
@@ -9,9 +11,14 @@ type UserType = {
   phone: string;
 };
 
-type SignInData = {
+type SignInResponse = {
   user: UserType;
   token: string;
+};
+
+type SignInData = {
+  email: string;
+  password: string;
 };
 
 type UpdateProfileData = {
@@ -25,12 +32,12 @@ type AuthContextData = {
   isSigned: boolean;
   token: string;
   user: UserType | null;
-  signIn: (data: SignInData) => void;
+  signIn: (data: SignInData) => Promise<void>;
   signOut: () => void;
   updateProfile: (data: UpdateProfileData) => void;
 };
 
-type AuthContextProviderProps = {
+type AuthProviderProps = {
   children: ReactNode;
 };
 
@@ -38,9 +45,7 @@ export const AuthContext = createContext<AuthContextData>(
   {} as AuthContextData
 );
 
-export function AuthContextProvider({
-  children,
-}: AuthContextProviderProps): JSX.Element {
+export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const navigate = useNavigate();
 
   const [token, setToken] = useState(() => {
@@ -64,12 +69,21 @@ export function AuthContextProvider({
 
   const isSigned = useMemo(() => !!token && !!user?.id, [token, user]);
 
-  function signIn(data: SignInData): void {
-    localStorage.setItem('@mocha:token', data.token);
-    localStorage.setItem('@mocha:user', JSON.stringify(data.user));
+  async function signIn({ email, password }: SignInData): Promise<void> {
+    try {
+      const response = await api.post<SignInResponse>('/sessions', {
+        email,
+        password,
+      });
 
-    setToken(data.token);
-    setUser(data.user);
+      localStorage.setItem('@mocha:token', response.data.token);
+      localStorage.setItem('@mocha:user', JSON.stringify(response.data.user));
+
+      setToken(response.data.token);
+      setUser(response.data.user);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   function signOut(): void {

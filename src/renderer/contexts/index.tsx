@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 
-import { AuthContextProvider } from './AuthContext';
-import { ProjectContextProvider } from './ProjectContext';
+import { AuthProvider } from './AuthContext';
+import { ProjectProvider } from './ProjectContext';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -9,8 +9,8 @@ interface AuthProviderProps {
 
 export function AppProvider({ children }: AuthProviderProps): JSX.Element {
   return (
-    <AuthContextProvider>
-      <ProjectContextProvider>{children}</ProjectContextProvider>
-    </AuthContextProvider>
+    <AuthProvider>
+      <ProjectProvider>{children}</ProjectProvider>
+    </AuthProvider>
   );
 }

@@ -1,6 +1,14 @@
-import { createContext, ReactNode, useEffect, useState } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 import { api } from '@services/api';
+
+import { AuthContext } from './AuthContext';
 
 type ProjectType = {
   id: string;
@@ -8,14 +16,18 @@ type ProjectType = {
   createdAt: Date;
 };
 
+type CreateProjectData = {
+  title: string;
+};
+
 type ProjectContextData = {
   projectSelected: ProjectType;
   projects: ProjectType[];
   selectProject: (id: string) => void;
-  createProject: (project: ProjectType) => void;
+  createProject: (data: CreateProjectData) => Promise<void>;
 };
 
-type ProjectContextProviderProps = {
+type ProjectProviderProps = {
   children: ReactNode;
 };
 
@@ -23,9 +35,11 @@ export const ProjectContext = createContext<ProjectContextData>(
   {} as ProjectContextData
 );
 
-export function ProjectContextProvider({
+export function ProjectProvider({
   children,
-}: ProjectContextProviderProps): JSX.Element {
+}: ProjectProviderProps): JSX.Element {
+  const { isSigned } = useContext(AuthContext);
+
   const [projectSelected, setProjectSelected] = useState<ProjectType>(
     {} as ProjectType
   );
@@ -38,8 +52,10 @@ export function ProjectContextProvider({
       setProjects(response.data);
     }
 
-    loadProjects();
-  }, []);
+    if (isSigned) {
+      loadProjects();
+    }
+  }, [isSigned]);
 
   function selectProject(id: string): void {
     const findProject = projects.find((project) => project.id === id);
@@ -49,8 +65,16 @@ export function ProjectContextProvider({
     }
   }
 
-  function createProject(project: ProjectType): void {
-    setProjects((prevState) => [...prevState, project]);
+  async function createProject({ title }: CreateProjectData): Promise<void> {
+    try {
+      const response = await api.post(`/projects`, {
+        title,
+      });
+
+      setProjects((prevState) => [...prevState, response.data]);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   return (

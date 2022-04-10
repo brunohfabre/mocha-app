@@ -1,10 +1,12 @@
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import { useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import getValidationErrors from 'renderer/helpers/getValidationErrors';
 import { api } from 'renderer/services/api';
 import * as Yup from 'yup';
+
+import { AuthContext } from '@contexts/AuthContext';
 
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
@@ -21,6 +23,8 @@ interface FormData {
 }
 
 export function SignUp(): JSX.Element {
+  const { signIn } = useContext(AuthContext);
+
   const navigate = useNavigate();
 
   const formRef = useRef<FormHandles>(null);
@@ -59,9 +63,7 @@ export function SignUp(): JSX.Element {
         password,
       });
 
-      window.alert('Account created. Please log in.');
-
-      navigate(-1);
+      await signIn({ email, password });
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErrors(err);
