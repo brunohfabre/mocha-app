@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import { toast } from 'react-toastify';
 
 import { api } from '@services/api';
 
@@ -13,7 +14,8 @@ import { AuthContext } from './AuthContext';
 type ProjectType = {
   id: string;
   title: string;
-  createdAt: Date;
+  created_at: Date;
+  is_default: boolean;
 };
 
 type CreateProjectData = {
@@ -25,6 +27,7 @@ type ProjectContextData = {
   projects: ProjectType[];
   selectProject: (id: string) => void;
   createProject: (data: CreateProjectData) => Promise<void>;
+  deleteProject: (id: string) => void;
 };
 
 type ProjectProviderProps = {
@@ -47,9 +50,17 @@ export function ProjectProvider({
 
   useEffect(() => {
     async function loadProjects() {
-      const response = await api.get('/projects');
+      const response = await api.get<ProjectType[]>('/projects');
 
       setProjects(response.data);
+
+      const findDefaultProject = response.data.find(
+        (project) => project.is_default
+      );
+
+      if (findDefaultProject) {
+        setProjectSelected(findDefaultProject);
+      }
     }
 
     if (isSigned) {
@@ -72,14 +83,42 @@ export function ProjectProvider({
       });
 
       setProjects((prevState) => [...prevState, response.data]);
+
+      setProjectSelected(response.data);
     } catch (err) {
-      console.log(err);
+      console.error(err);
+    }
+  }
+
+  async function deleteProject(id: string): Promise<void> {
+    try {
+      await api.delete(`/projects/${id}`);
+
+      toast.success('Project deleted.');
+
+      setProjects((prevState) =>
+        prevState.filter((project) => project.id !== id)
+      );
+
+      const findDefaultProject = projects.find((project) => project.is_default);
+
+      if (findDefaultProject) {
+        setProjectSelected(findDefaultProject);
+      }
+    } catch (err) {
+      console.error(err);
     }
   }
 
   return (
     <ProjectContext.Provider
-      value={{ projectSelected, projects, selectProject, createProject }}
+      value={{
+        projectSelected,
+        projects,
+        selectProject,
+        createProject,
+        deleteProject,
+      }}
     >
       {children}
     </ProjectContext.Provider>

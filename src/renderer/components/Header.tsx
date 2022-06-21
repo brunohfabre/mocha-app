@@ -3,14 +3,11 @@ import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { useContext, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 
 import getValidationErrors from '@helpers/getValidationErrors';
 
 import { ProjectContext } from '@contexts/ProjectContext';
-
-import { api } from '@services/api';
 
 import { usePageTitle } from '@hooks/pageTitleHook';
 
@@ -26,8 +23,13 @@ type HandleSubmitData = {
 export function Header(): JSX.Element {
   const formRef = useRef<FormHandles>(null);
 
-  const { projectSelected, projects, selectProject, createProject } =
-    useContext(ProjectContext);
+  const {
+    projectSelected,
+    projects,
+    selectProject,
+    createProject,
+    deleteProject,
+  } = useContext(ProjectContext);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -78,9 +80,7 @@ export function Header(): JSX.Element {
     try {
       setIsLoading(true);
 
-      await api.delete(`/projects/${id}`);
-
-      toast.success('Project deleted.');
+      await deleteProject(id);
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +96,12 @@ export function Header(): JSX.Element {
         title="Add new project"
       >
         <Form ref={formRef} onSubmit={handleSubmit}>
-          <Input name="title" label="Project name" placeholder="Project name" />
+          <Input
+            name="title"
+            label="Project name"
+            placeholder="Project name"
+            autoFocus
+          />
 
           <footer className="pt-8 flex justify-end gap-2">
             <Button type="button" onClick={() => setOpen(false)}>
@@ -151,16 +156,18 @@ export function Header(): JSX.Element {
               >
                 {project.title}
 
-                <button
-                  className="p-2 hover:bg-red-400"
-                  onClick={(event) => {
-                    event.stopPropagation();
+                {!project.is_default && (
+                  <button
+                    className="p-2 hover:bg-red-400"
+                    onClick={(event) => {
+                      event.stopPropagation();
 
-                    handleDeleteProject(project.id);
-                  }}
-                >
-                  X
-                </button>
+                      handleDeleteProject(project.id);
+                    }}
+                  >
+                    X
+                  </button>
+                )}
               </DropdownMenu.Item>
             ))}
 
