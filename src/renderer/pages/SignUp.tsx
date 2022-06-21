@@ -56,8 +56,8 @@ export function SignUp(): JSX.Element {
       setIsLoading(true);
 
       await api.post('/users', {
-        firstName,
-        lastName,
+        first_name: firstName,
+        last_name: lastName,
         phone,
         email,
         password,
@@ -80,8 +80,8 @@ export function SignUp(): JSX.Element {
       <Spin spinning={isLoading} />
 
       <div className="h-screen flex flex-col items-center justify-center">
-        <div className="p-8 flex flex-col max-w-sm w-full">
-          <h1 className="text-4xl font-bold self-center">Sign Up</h1>
+        <div className="p-8 flex flex-col max-w-md w-full">
+          <h1 className="text-3xl font-bold self-center">Sign Up</h1>
 
           <Form
             ref={formRef}
@@ -112,7 +112,7 @@ export function SignUp(): JSX.Element {
             </Button>
           </Form>
 
-          <span className="self-center mt-8">
+          <span className="self-center mt-8 text-sm">
             Already have an account?{' '}
             <LinkButton onClick={() => navigate(-1)}>Sign in</LinkButton>
           </span>

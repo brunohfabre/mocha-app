@@ -34,17 +34,21 @@ export function Input({
 
   return (
     <div className={`flex flex-col gap-1 ${className}`}>
-      {label && <label htmlFor={fieldName}>{label}</label>}
+      {label && (
+        <label htmlFor={fieldName} className="text-sm">
+          {label}
+        </label>
+      )}
 
       <input
         id={fieldName}
         ref={inputRef}
-        className="h-10 bg-pink-300 px-4 text-slate-900 placeholder:text-slate-400"
+        className="h-10 bg-pink-300 px-4 text-sm text-slate-900 placeholder:text-slate-400"
         defaultValue={defaultValue}
         {...rest}
       />
 
-      {error && <span className="text-red-500">{error}</span>}
+      {error && <span className="text-red-500 text-sm">{error}</span>}
     </div>
   );
 }

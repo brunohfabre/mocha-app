@@ -59,12 +59,12 @@ export function SignIn(): JSX.Element {
       <Spin spinning={isLoading} />
 
       <div className="h-screen flex flex-col items-center justify-center">
-        <div className="p-8 flex flex-col max-w-sm w-full">
-          <h1 className="text-4xl font-bold self-center">Sign In</h1>
+        <div className="p-8 flex flex-col max-w-md w-full">
+          <h1 className="text-3xl font-bold self-center">Sign In</h1>
 
           <Button
             type="button"
-            className="mt-12"
+            className="mt-8"
             onClick={() => window.alert('Under construction.')}
           >
             continue with github
@@ -75,7 +75,7 @@ export function SignIn(): JSX.Element {
           <Form
             ref={formRef}
             onSubmit={handleSubmit}
-            className="flex flex-col gap-2 "
+            className="flex flex-col gap-2"
           >
             <Input name="email" placeholder="Email" label="Email" />
             <Input name="password" placeholder="Password" label="Password" />
@@ -86,13 +86,13 @@ export function SignIn(): JSX.Element {
           </Form>
 
           <LinkButton
-            className="mt-8"
+            className="mt-8 text-sm"
             onClick={() => window.alert('Under construction.')}
           >
             Forgot password?
           </LinkButton>
 
-          <span className="self-center mt-8">
+          <span className="self-center mt-4 text-sm">
             Don&apos;t have account?{' '}
             <LinkButton onClick={() => navigate('signup')}>Sign up</LinkButton>
           </span>
