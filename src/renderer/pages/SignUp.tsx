@@ -1,6 +1,6 @@
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import { useContext, useRef, useState } from 'react';
+import { useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import getValidationErrors from 'renderer/helpers/getValidationErrors';
 import { api } from 'renderer/services/api';
@@ -8,10 +8,11 @@ import * as Yup from 'yup';
 
 import { AuthContext } from '@contexts/AuthContext';
 
+import { useLoading } from '@hooks/loadingHook';
+
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
 import { LinkButton } from '@components/LinkButton';
-import { Spin } from '@components/Spin';
 
 interface FormData {
   firstName: string;
@@ -27,9 +28,9 @@ export function SignUp(): JSX.Element {
 
   const navigate = useNavigate();
 
-  const formRef = useRef<FormHandles>(null);
+  const { setLoading } = useLoading();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const formRef = useRef<FormHandles>(null);
 
   async function handleSubmit(data: FormData): Promise<void> {
     const { firstName, lastName, phone, email, password } = data;
@@ -53,7 +54,7 @@ export function SignUp(): JSX.Element {
         abortEarly: false,
       });
 
-      setIsLoading(true);
+      setLoading(true);
 
       await api.post('/users', {
         first_name: firstName,
@@ -71,14 +72,12 @@ export function SignUp(): JSX.Element {
         formRef.current?.setErrors(errors);
       }
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }
 
   return (
     <>
-      <Spin spinning={isLoading} />
-
       <div className="h-screen flex flex-col items-center justify-center">
         <div className="p-8 flex flex-col max-w-md w-full">
           <h1 className="text-3xl font-bold self-center">Sign Up</h1>

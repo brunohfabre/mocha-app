@@ -6,13 +6,14 @@ import { Alert } from 'renderer/components/Alert';
 import { Button } from 'renderer/components/Button';
 import { Input } from 'renderer/components/Input';
 import { Modal } from 'renderer/components/Modal';
-import { Spin } from 'renderer/components/Spin';
 import getValidationErrors from 'renderer/helpers/getValidationErrors';
 import { usePageTitle } from 'renderer/hooks/pageTitleHook';
 import { api } from 'renderer/services/api';
 import * as Yup from 'yup';
 
 import { ProjectContext } from '@contexts/ProjectContext';
+
+import { useLoading } from '@hooks/loadingHook';
 
 import { ConnectionItem } from './ConnectionItem';
 
@@ -60,12 +61,13 @@ function ConnectionTypeButton({
 export function Connections(): JSX.Element {
   const { projectSelected } = useContext(ProjectContext);
 
+  const { setLoading } = useLoading();
+
   const formRef = useRef<FormHandles>(null);
   const searchFormRef = useRef<FormHandles>(null);
 
   const { replaceTitle } = usePageTitle();
 
-  const [isLoading, setIsLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [typeSelected, setTypeSelected] = useState<ConnectionType>('POSTGRES');
   const [connections, setConnections] = useState<Connection[]>([]);
@@ -100,7 +102,7 @@ export function Connections(): JSX.Element {
 
   useEffect(() => {
     async function loadConnections(): Promise<void> {
-      setIsLoading(true);
+      setLoading(true);
 
       const response = await api.get('/connections', {
         headers: {
@@ -110,11 +112,11 @@ export function Connections(): JSX.Element {
 
       setConnections(response.data);
 
-      setIsLoading(false);
+      setLoading(false);
     }
 
     loadConnections();
-  }, [setIsLoading, projectSelected.id]);
+  }, [setLoading, projectSelected.id]);
 
   function handleCloseModal(): void {
     setModalVisible(false);
@@ -124,7 +126,7 @@ export function Connections(): JSX.Element {
 
   async function handleCreateConnection(): Promise<void> {
     try {
-      setIsLoading(true);
+      setLoading(true);
 
       const data = formRef.current?.getData();
 
@@ -154,7 +156,7 @@ export function Connections(): JSX.Element {
       setWithoutTestingAlert(false);
       handleCloseModal();
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }
 
@@ -180,7 +182,7 @@ export function Connections(): JSX.Element {
         return;
       }
 
-      setIsLoading(true);
+      setLoading(true);
 
       handleCreateConnection();
     } catch (err: any) {
@@ -191,7 +193,7 @@ export function Connections(): JSX.Element {
         return;
       }
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }
 
@@ -214,7 +216,7 @@ export function Connections(): JSX.Element {
         abortEarly: false,
       });
 
-      setIsLoading(true);
+      setLoading(true);
 
       await window.electron.invoke('test-connection', {
         type: typeSelected,
@@ -237,14 +239,12 @@ export function Connections(): JSX.Element {
 
       toast.error(err.message.toLowerCase().split('error:')[1].trimStart());
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }
 
   return (
     <>
-      <Spin spinning={isLoading} />
-
       <Modal
         isOpen={modalVisible}
         onRequestClose={handleCloseModal}

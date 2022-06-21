@@ -3,7 +3,8 @@ import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { v4 as uuid } from 'uuid';
 
-import { Spin } from '@components/Spin';
+import { useLoading } from '@hooks/loadingHook';
+
 import { Table } from '@components/Table';
 
 type TableViewProps = {
@@ -19,7 +20,8 @@ export function TableView({ table }: TableViewProps): JSX.Element {
   const { connection_id: connectionId } =
     useParams<{ connection_id: string }>();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const { setLoading } = useLoading();
+
   const [lastQuery, setLastQuery] = useState('');
   const [isQuired, setIsQuired] = useState(false);
   const [fields, setFields] = useState<FieldType[]>([]);
@@ -31,7 +33,7 @@ export function TableView({ table }: TableViewProps): JSX.Element {
       try {
         const initialTime = Date.now();
 
-        setIsLoading(true);
+        setLoading(true);
 
         const value = `select * from ${table};`;
 
@@ -56,7 +58,7 @@ export function TableView({ table }: TableViewProps): JSX.Element {
       } catch (err: any) {
         toast.error(err.message.toLowerCase().split('error:')[1].trimStart());
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     }
 
@@ -77,8 +79,6 @@ export function TableView({ table }: TableViewProps): JSX.Element {
 
   return (
     <>
-      <Spin spinning={isLoading} />
-
       <section className="flex-1 flex flex-col overflow-auto">
         <div className="bg-orange-100 flex-1 w-full overflow-auto">
           <Table

@@ -2,9 +2,10 @@ import { omit } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useParams } from 'react-router-dom';
-import { Spin } from 'renderer/components/Spin';
 
 import { commandOrCtrl } from '@helpers/commandOrCtrl';
+
+import { useLoading } from '@hooks/loadingHook';
 
 type FieldType = {
   name: string;
@@ -72,7 +73,8 @@ export function Table({
   const { connection_id: connectionId } =
     useParams<{ connection_id: string }>();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const { setLoading } = useLoading();
+
   const [items, setItems] = useState<{
     [key: string]: { [key: string]: string | number };
   }>({});
@@ -95,7 +97,7 @@ export function Table({
         throw new Error('nao pode ter join');
       }
 
-      setIsLoading(true);
+      setLoading(true);
 
       const filteredItems = Object.keys(items).filter(
         (key: string) => !!Object.keys(items[key]).length
@@ -126,7 +128,7 @@ export function Table({
     } catch (err: any) {
       console.log(err.message);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }
 
@@ -143,8 +145,6 @@ export function Table({
 
   return (
     <>
-      <Spin spinning={isLoading} />
-
       <div
         className="w-full grid"
         style={{

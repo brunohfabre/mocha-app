@@ -10,10 +10,11 @@ import getValidationErrors from '@helpers/getValidationErrors';
 
 import { api } from '@services/api';
 
+import { useLoading } from '@hooks/loadingHook';
+
 import { Alert } from '@components/Alert';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
-import { Spin } from '@components/Spin';
 
 type ConnectionType = 'POSTGRES' | 'MYSQL' | 'MARIADB';
 
@@ -43,9 +44,9 @@ export function ConnectionItem({
 }: ConnectionItemProps): JSX.Element {
   const navigate = useNavigate();
 
-  const formRef = useRef<FormHandles>(null);
+  const { setLoading } = useLoading();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const formRef = useRef<FormHandles>(null);
   const [deleteAlertVisible, setDeleteAlertVisible] = useState(false);
 
   async function handleDelete(data: FormData): Promise<void> {
@@ -66,7 +67,7 @@ export function ConnectionItem({
         throw new Error('The name entered is not the same as the connection.');
       }
 
-      setIsLoading(true);
+      setLoading(true);
 
       await window.electron.invoke('destroy-connection', { id: connection.id });
 
@@ -87,30 +88,28 @@ export function ConnectionItem({
 
       toast.error(err.message);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }
 
   async function handleConnect(): Promise<void> {
     try {
-      setIsLoading(true);
+      setLoading(true);
 
       await window.electron.invoke('connect', connection);
 
       navigate(`${connection.id}/databases`);
     } catch (err: any) {
-      console.log(err.message);
+      console.error(err.message);
 
       toast.error(err.message.toLowerCase().split('error:')[1].trimStart());
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }
 
   return (
     <>
-      <Spin spinning={isLoading} />
-
       <Alert
         isOpen={deleteAlertVisible}
         onRequestClose={() => setDeleteAlertVisible(false)}

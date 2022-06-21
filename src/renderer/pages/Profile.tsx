@@ -1,6 +1,6 @@
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { usePageTitle } from 'renderer/hooks/pageTitleHook';
 import * as Yup from 'yup';
 
@@ -10,9 +10,10 @@ import { AuthContext } from '@contexts/AuthContext';
 
 import { api } from '@services/api';
 
+import { useLoading } from '@hooks/loadingHook';
+
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
-import { Spin } from '@components/Spin';
 
 type HandleSubmitData = {
   firstName: string;
@@ -24,11 +25,11 @@ type HandleSubmitData = {
 export function Profile(): JSX.Element {
   const formRef = useRef<FormHandles>(null);
 
+  const { setLoading } = useLoading();
+
   const { user, updateProfile } = useContext(AuthContext);
 
   const { replaceTitle } = usePageTitle();
-
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     replaceTitle('Profile');
@@ -49,7 +50,7 @@ export function Profile(): JSX.Element {
         abortEarly: false,
       });
 
-      setIsLoading(true);
+      setLoading(true);
 
       const { firstName, lastName, email, phone } = data;
 
@@ -68,13 +69,12 @@ export function Profile(): JSX.Element {
         formRef.current?.setErrors(errors);
       }
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }
 
   return (
     <>
-      <Spin spinning={isLoading} />
       <div className="mx-auto w-full max-w-xl p-8">
         profile page
         <Form ref={formRef} onSubmit={handleSubmit} initialData={user ?? {}}>

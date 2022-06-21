@@ -5,10 +5,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { usePageTitle } from 'renderer/hooks/pageTitleHook';
 
+import { useLoading } from '@hooks/loadingHook';
+
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
 import { Modal } from '@components/Modal';
-import { Spin } from '@components/Spin';
 
 type DatabaseType = {
   name: string;
@@ -22,9 +23,10 @@ export function Databases(): JSX.Element {
 
   const { replaceTitle } = usePageTitle();
 
+  const { setLoading } = useLoading();
+
   const searchFormRef = useRef<FormHandles>(null);
 
-  const [isLoading, setIsLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [search, setSearch] = useState('');
   const [databases, setDatabases] = useState<DatabaseType[]>([]);
@@ -35,7 +37,7 @@ export function Databases(): JSX.Element {
   useEffect(() => {
     async function loadDatabases(): Promise<void> {
       try {
-        setIsLoading(true);
+        setLoading(true);
 
         const response = await window.electron.invoke('show-databases', {
           connectionId,
@@ -49,10 +51,10 @@ export function Databases(): JSX.Element {
 
         replaceTitle(info.name);
       } catch (err: any) {
-        console.log(err.message);
+        console.error(err.message);
         toast.error(err.message.toLowerCase().split('error:')[1].trimStart());
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     }
 
@@ -81,7 +83,7 @@ export function Databases(): JSX.Element {
 
   async function handleSelectDatabase(database: string): Promise<void> {
     try {
-      setIsLoading(true);
+      setLoading(true);
 
       await window.electron.invoke('select-database', {
         connectionId,
@@ -96,14 +98,12 @@ export function Databases(): JSX.Element {
     } catch (err: any) {
       console.log(err.message);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }
 
   return (
     <>
-      <Spin spinning={isLoading} />
-
       <Modal
         isOpen={modalVisible}
         onRequestClose={() => setModalVisible(false)}

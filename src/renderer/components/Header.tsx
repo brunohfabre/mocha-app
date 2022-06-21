@@ -9,12 +9,12 @@ import getValidationErrors from '@helpers/getValidationErrors';
 
 import { ProjectContext } from '@contexts/ProjectContext';
 
+import { useLoading } from '@hooks/loadingHook';
 import { usePageTitle } from '@hooks/pageTitleHook';
 
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
 import { Modal } from '@components/Modal';
-import { Spin } from '@components/Spin';
 
 type HandleSubmitData = {
   title: string;
@@ -34,10 +34,11 @@ export function Header(): JSX.Element {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const { setLoading } = useLoading();
+
   const { title: pageTitle } = usePageTitle();
 
   const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const showBackButton =
     location.pathname.split('/').filter((item) => Boolean(item)).length > 1;
@@ -58,7 +59,7 @@ export function Header(): JSX.Element {
         abortEarly: false,
       });
 
-      setIsLoading(true);
+      setLoading(true);
 
       const { title } = data;
 
@@ -70,7 +71,7 @@ export function Header(): JSX.Element {
         formRef.current?.setErrors(errors);
       }
     } finally {
-      setIsLoading(false);
+      setLoading(false);
 
       setOpen(false);
     }
@@ -78,18 +79,16 @@ export function Header(): JSX.Element {
 
   async function handleDeleteProject(id: string): Promise<void> {
     try {
-      setIsLoading(true);
+      setLoading(true);
 
       await deleteProject(id);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }
 
   return (
     <>
-      <Spin spinning={isLoading} />
-
       <Modal
         isOpen={open}
         onRequestClose={() => setOpen(false)}

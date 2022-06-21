@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { usePageTitle } from 'renderer/hooks/pageTitleHook';
 
+import { useLoading } from '@hooks/loadingHook';
+
 import { Insidebar } from '@components/Insidebar';
-import { Spin } from '@components/Spin';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@components/Tabs';
 
 import { Sql } from './Sql';
@@ -16,7 +17,7 @@ export function Tables(): JSX.Element {
 
   const { addToTitle } = usePageTitle();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const { setLoading } = useLoading();
 
   const [tables, setTables] = useState<string[]>([]);
 
@@ -33,7 +34,7 @@ export function Tables(): JSX.Element {
   useEffect(() => {
     async function loadTables(): Promise<void> {
       try {
-        setIsLoading(true);
+        setLoading(true);
 
         const response = await window.electron.invoke('show-tables', {
           connectionId,
@@ -45,7 +46,7 @@ export function Tables(): JSX.Element {
       } catch (err: any) {
         console.log(err.message);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     }
 
@@ -75,48 +76,44 @@ export function Tables(): JSX.Element {
   }
 
   return (
-    <>
-      <Spin spinning={isLoading} />
+    <div className="flex-1 flex overflow-auto">
+      <Insidebar
+        functions={[]}
+        tables={tables}
+        onClick={(tab) => {
+          setTabSelected(tabs.length);
+          setTabs((prevState) => [...prevState, tab]);
+          setPanels((prevState) => [
+            ...prevState,
+            () => <TableView table={tab} />,
+          ]);
+        }}
+      />
 
-      <div className="flex-1 flex overflow-auto">
-        <Insidebar
-          functions={[]}
-          tables={tables}
-          onClick={(tab) => {
-            setTabSelected(tabs.length);
-            setTabs((prevState) => [...prevState, tab]);
-            setPanels((prevState) => [
-              ...prevState,
-              () => <TableView table={tab} />,
-            ]);
-          }}
-        />
+      <Tabs index={tabSelected} onChange={setTabSelected}>
+        <TabList>
+          {tabs.map((tab) => (
+            <Tab
+              key={tab}
+              onDelete={
+                tab !== 'sql'
+                  ? (value: number) => handleDeleteTab(value)
+                  : undefined
+              }
+            >
+              {tab}
+            </Tab>
+          ))}
+        </TabList>
 
-        <Tabs index={tabSelected} onChange={setTabSelected}>
-          <TabList>
-            {tabs.map((tab) => (
-              <Tab
-                key={tab}
-                onDelete={
-                  tab !== 'sql'
-                    ? (value: number) => handleDeleteTab(value)
-                    : undefined
-                }
-              >
-                {tab}
-              </Tab>
-            ))}
-          </TabList>
-
-          <TabPanels>
-            {panels.map((Panel) => (
-              <TabPanel key={JSON.stringify(Panel)}>
-                <Panel />
-              </TabPanel>
-            ))}
-          </TabPanels>
-        </Tabs>
-      </div>
-    </>
+        <TabPanels>
+          {panels.map((Panel) => (
+            <TabPanel key={JSON.stringify(Panel)}>
+              <Panel />
+            </TabPanel>
+          ))}
+        </TabPanels>
+      </Tabs>
+    </div>
   );
 }

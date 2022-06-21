@@ -12,8 +12,9 @@ import { v4 as uuid } from 'uuid';
 
 import { commandOrCtrl } from '@helpers/commandOrCtrl';
 
+import { useLoading } from '@hooks/loadingHook';
+
 import { Button } from '@components/Button';
-import { Spin } from '@components/Spin';
 import { Table } from '@components/Table';
 
 type FieldType = {
@@ -29,9 +30,10 @@ export function Sql({ tables }: SqlProps): JSX.Element {
   const { connection_id: connectionId } =
     useParams<{ connection_id: string }>();
 
+  const { setLoading } = useLoading();
+
   const editorRef = useRef<AceEditor>(null);
 
-  const [isLoading, setIsLoading] = useState(false);
   const [lastQuery, setLastQuery] = useState('');
   const [isQuired, setIsQuired] = useState(false);
   const [fields, setFields] = useState<FieldType[]>([]);
@@ -69,7 +71,7 @@ export function Sql({ tables }: SqlProps): JSX.Element {
     try {
       const initialTime = Date.now();
 
-      setIsLoading(true);
+      setLoading(true);
 
       if (!editorRef.current) {
         return;
@@ -98,7 +100,7 @@ export function Sql({ tables }: SqlProps): JSX.Element {
     } catch (err: any) {
       toast.error(err.message.toLowerCase().split('error:')[1].trimStart());
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }
 
@@ -127,8 +129,6 @@ export function Sql({ tables }: SqlProps): JSX.Element {
 
   return (
     <>
-      <Spin spinning={isLoading} />
-
       <section className="flex-1 bg-teal-100 flex flex-col justify-between overflow-auto">
         <AceEditor
           ref={editorRef}
