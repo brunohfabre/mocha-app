@@ -152,13 +152,16 @@ export function Table({
         }}
       >
         {fields.map((field) => (
-          <div className="bg-red-300">{field.name}</div>
+          <div key={field.name} className="bg-red-300">
+            {field.name}
+          </div>
         ))}
 
         {rows.map((row) => (
           <>
             {fields.map((field) => (
               <Row
+                key={field.name}
                 defaultValue={row[field.name]}
                 isUpdated={items[row.rowId] && !!items[row.rowId][field.name]}
                 setToUpdate={(value) => {

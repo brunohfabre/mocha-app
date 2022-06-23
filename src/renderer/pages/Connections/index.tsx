@@ -116,7 +116,7 @@ export function Connections(): JSX.Element {
     }
 
     loadConnections();
-  }, [setLoading, projectSelected.id]);
+  }, [projectSelected.id]);
 
   function handleCloseModal(): void {
     setModalVisible(false);

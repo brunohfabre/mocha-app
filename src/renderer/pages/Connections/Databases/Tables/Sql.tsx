@@ -45,10 +45,10 @@ export function Sql({ tables }: SqlProps): JSX.Element {
 
     const sqlTablesCompleter = {
       getCompletions: (
-        editor: Ace.Editor,
-        session: Ace.EditSession,
-        point: Ace.Point,
-        string: string,
+        _: Ace.Editor,
+        __: Ace.EditSession,
+        ___: Ace.Point,
+        ____: string,
         callback: Ace.CompleterCallback
       ): void => {
         callback(
